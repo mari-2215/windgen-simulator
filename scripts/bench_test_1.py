@@ -1,4 +1,4 @@
-"""Safe-by-default Phase 1 bench test for Raspberry Pi + SpeedyBee F405 V4.
+"""Bench Test 1 for Raspberry Pi + SpeedyBee F405 V4, safe by default.
 
 Run mock first, then serial-check with ESC power disconnected. Motor mode is experimental and
 requires three typed confirmations. Never run the initial test with a propeller installed.
@@ -94,7 +94,7 @@ def run_motor(port: str, baudrate: int, motor: int, maximum: float, duration_s: 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Neural Offshore Wind Lab bench test")
+    parser = argparse.ArgumentParser(description="Neural Offshore Wind Lab - Bench Test 1")
     parser.add_argument("--mode", choices=("mock", "serial-check", "motor"), default="mock")
     parser.add_argument("--port", help="Linux example: /dev/ttyACM0; Windows example: COM5")
     parser.add_argument("--baudrate", type=int, default=115200)
@@ -119,4 +119,3 @@ if __name__ == "__main__":
     except (PermissionError, TimeoutError, RuntimeError, OSError) as error:
         print(f"FAIL SAFE: {error}", file=sys.stderr)
         raise SystemExit(2) from error
-

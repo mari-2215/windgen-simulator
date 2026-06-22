@@ -57,7 +57,7 @@ Por isso, esta versão não usa PyMAVLink. O Pi executa geração, inferência e
 continua responsável pelo sinal temporizado ao ESC. Consulte [docs/hardware.md](docs/hardware.md).
 
 Para o primeiro teste com Raspberry Pi 2B, SpeedyBee F405 V4 e um motor, siga o roteiro
-[Teste de bancada e filmagem](docs/BENCH_TEST_TOMORROW.pt-BR.md). O teste começa em `mock`, faz
+[Bench Test 1 - teste de bancada e filmagem](docs/BENCH_TEST_1.pt-BR.md). O teste começa em `mock`, faz
 uma consulta MSP somente-leitura e só libera um giro curto após confirmações explícitas.
 
 Python 3.12 é a versão-alvo do projeto. Em Raspberry Pi OS, confirme a disponibilidade para a

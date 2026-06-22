@@ -1,4 +1,4 @@
-# Teste de bancada e filmagem - Fase 1
+# Bench Test 1 - teste de bancada e filmagem
 
 Este roteiro foi feito para o material disponível: Raspberry Pi 2B, SpeedyBee F405 V4 stack e um
 motor brushless outrunner. Ele não substitui a confirmação elétrica do motor, ESC e fonte.
@@ -40,7 +40,7 @@ export PYTHONPATH="$PWD/src"
 ## 2. Teste sem hardware
 
 ```bash
-python3 scripts/bench_test.py --mode mock
+python3 scripts/bench_test_1.py --mode mock
 ```
 
 Resultado esperado: `MOCK PASS`. Grave a tela mostrando a rampa de 0% a 10% e a parada.
@@ -51,7 +51,7 @@ Conecte somente o USB da F405, sem alimentação de potência no ESC:
 
 ```bash
 ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null
-python3 scripts/bench_test.py --mode serial-check --port /dev/ttyACM0
+python3 scripts/bench_test_1.py --mode serial-check --port /dev/ttyACM0
 ```
 
 O nome pode ser diferente. Resultado esperado: `SERIAL PASS` e a versão da API MSP. Se houver
@@ -67,7 +67,7 @@ timeout, pare aqui e verifique cabo de dados, porta, permissões e configuraçã
 6. Energize o ESC somente com fonte/bateria comprovadamente compatível.
 
 ```bash
-python3 scripts/bench_test.py \
+python3 scripts/bench_test_1.py \
   --mode motor \
   --port /dev/ttyACM0 \
   --motor 1 \

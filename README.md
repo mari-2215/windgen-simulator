@@ -58,7 +58,7 @@ scenario generation, inference, logging, and supervision; the F405 remains respo
 time-critical ESC signal.
 
 For the first Raspberry Pi 2B + SpeedyBee F405 V4 + one-motor test, see the Portuguese
-[bench-test and filming guide](docs/BENCH_TEST_TOMORROW.pt-BR.md). The workflow starts in mock
+[Bench Test 1 and filming guide](docs/BENCH_TEST_1.pt-BR.md). The workflow starts in mock
 mode, performs a read-only MSP probe, and only then permits a short, explicitly confirmed spin.
 
 Python 3.12 is the project target. Confirm that it is available for the Raspberry Pi OS image and
