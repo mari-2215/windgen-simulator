@@ -56,6 +56,10 @@ usa Raspberry Pi 2B e SpeedyBee F405 V4, normalmente associada ao ecossistema Be
 Por isso, esta versão não usa PyMAVLink. O Pi executa geração, inferência e supervisão; a F405
 continua responsável pelo sinal temporizado ao ESC. Consulte [docs/hardware.md](docs/hardware.md).
 
+Para o primeiro teste com Raspberry Pi 2B, SpeedyBee F405 V4 e um motor, siga o roteiro
+[Teste de bancada e filmagem](docs/BENCH_TEST_TOMORROW.pt-BR.md). O teste começa em `mock`, faz
+uma consulta MSP somente-leitura e só libera um giro curto após confirmações explícitas.
+
 Python 3.12 é a versão-alvo do projeto. Em Raspberry Pi OS, confirme a disponibilidade para a
 arquitetura/versão instalada; quando a imagem oficial oferecer outra versão, use container ou
 compile 3.12 conscientemente. O Pi 2 tem recursos limitados: evite retreinar durante o controle.

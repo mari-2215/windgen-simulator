@@ -57,6 +57,10 @@ version therefore does not pretend that MAVLink compatibility exists. The Raspbe
 scenario generation, inference, logging, and supervision; the F405 remains responsible for the
 time-critical ESC signal.
 
+For the first Raspberry Pi 2B + SpeedyBee F405 V4 + one-motor test, see the Portuguese
+[bench-test and filming guide](docs/BENCH_TEST_TOMORROW.pt-BR.md). The workflow starts in mock
+mode, performs a read-only MSP probe, and only then permits a short, explicitly confirmed spin.
+
 Python 3.12 is the project target. Confirm that it is available for the Raspberry Pi OS image and
 CPU architecture in use. The Pi 2 has limited resources, so model training should happen offline;
 only inference should run during control.
@@ -103,4 +107,3 @@ sensor feedback, and validation against applicable standards.
 - [Hardware and safety](docs/en/hardware.md)
 - [Implementation plan](docs/en/implementation_plan.md)
 - [Roadmap](docs/en/roadmap.md)
-

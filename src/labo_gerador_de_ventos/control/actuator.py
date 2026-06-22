@@ -23,6 +23,65 @@ class MockActuator:
         self.commands.append(0.0)
 
 
+def build_msp_v1_frame(command: int, payload: bytes = b"") -> bytes:
+    """Build a host-to-flight-controller MSP v1 frame."""
+    if not 0 <= command <= 255 or len(payload) > 255:
+        raise ValueError("MSP v1 command and payload must fit in one byte")
+    checksum = len(payload) ^ command
+    for byte in payload:
+        checksum ^= byte
+    return b"$M<" + bytes((len(payload), command)) + payload + bytes((checksum,))
+
+
+def read_msp_v1_response(serial_port: object, expected_command: int, timeout_s: float = 1.0) -> bytes:
+    """Read and validate one MSP v1 response, ignoring unrelated leading bytes."""
+    deadline = time.monotonic() + timeout_s
+    window = bytearray()
+    while time.monotonic() < deadline:
+        byte = serial_port.read(1)
+        if not byte:
+            continue
+        window.extend(byte)
+        if len(window) > 3:
+            del window[:-3]
+        if bytes(window) not in (b"$M>", b"$M!"):
+            continue
+        is_error = bytes(window) == b"$M!"
+        header = serial_port.read(2)
+        if len(header) != 2:
+            break
+        size, command = header
+        payload = serial_port.read(size)
+        checksum_bytes = serial_port.read(1)
+        if len(payload) != size or len(checksum_bytes) != 1:
+            break
+        checksum = size ^ command
+        for item in payload:
+            checksum ^= item
+        if checksum != checksum_bytes[0]:
+            raise RuntimeError("invalid MSP checksum")
+        if is_error:
+            raise RuntimeError(f"flight controller rejected MSP command {command}")
+        if command == expected_command:
+            return payload
+        window.clear()
+    raise TimeoutError(f"no valid MSP response for command {expected_command}")
+
+
+def probe_betaflight(port: str, baudrate: int = 115200) -> tuple[int, int, int]:
+    """Read-only MSP_API_VERSION probe; it never sends a motor command."""
+    import serial
+
+    with serial.Serial(port, baudrate=baudrate, timeout=0.1) as serial_port:
+        serial_port.reset_input_buffer()
+        serial_port.write(build_msp_v1_frame(1))  # MSP_API_VERSION
+        serial_port.flush()
+        payload = read_msp_v1_response(serial_port, expected_command=1)
+    if len(payload) < 3:
+        raise RuntimeError("unexpected MSP_API_VERSION payload")
+    return payload[0], payload[1], payload[2]
+
+
 class BetaflightMSPActuator:
     """Backend experimental MSP v1; exige validação local da versão do firmware."""
 
@@ -40,11 +99,7 @@ class BetaflightMSPActuator:
         self.motor_index = motor_index
 
     def _send(self, command: int, payload: bytes) -> None:
-        size = len(payload)
-        checksum = size ^ command
-        for byte in payload:
-            checksum ^= byte
-        self.serial.write(b"$M<" + bytes((size, command)) + payload + bytes((checksum,)))
+        self.serial.write(build_msp_v1_frame(command, payload))
         self.serial.flush()
 
     def set_throttle(self, value: float) -> None:
@@ -55,6 +110,9 @@ class BetaflightMSPActuator:
 
     def stop(self) -> None:
         self._send(self.MSP_SET_MOTOR, struct.pack("<8H", *([1000] * 8)))
+
+    def close(self) -> None:
+        self.serial.close()
 
 
 @dataclass
@@ -82,4 +140,3 @@ class SafetyController:
         self.actuator.stop()
         self._last = 0.0
         self._last_time = None
-
