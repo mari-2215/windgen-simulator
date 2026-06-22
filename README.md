@@ -1,0 +1,106 @@
+# Neural Offshore Wind Lab
+
+[Português (Brasil)](README.pt-BR.md)
+
+An academic Phase 1 prototype for an intelligent wind-generation system inspired by offshore
+operating scenarios. The software converts a natural-language prompt into a reproducible wind
+profile, generates a Weibull-based time series, and uses a lightweight neural network to estimate
+the command for one brushless motor.
+
+> **Safety notice:** hardware control is disabled by default. Never perform initial tests with a
+> propeller installed. Use a physical emergency stop, current-limited power supply, mechanical
+> shielding, secure mounting, and direct supervision. The experimental MSP backend must be
+> validated against the installed Betaflight version before the ESC is energized.
+
+## Phase 1 deliverables
+
+- reproducible Weibull wind generator with gusts and temporal correlation;
+- lightweight NumPy MLP: `(target wind speed, distance) -> throttle`;
+- controlled English and Portuguese prompt parsing without cloud services;
+- CSV export and PNG wind-speed plots;
+- Streamlit dashboard and command-line interface;
+- unit tests;
+- simulated actuator and opt-in experimental Betaflight/MSP backend;
+- system architecture, technical documentation, implementation plan, and roadmap.
+
+## Quick start
+
+```bash
+python -m venv .venv
+# Linux/Raspberry Pi: source .venv/bin/activate
+# Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+python scripts/train_model.py
+neural-wind-lab simulate --prompt "offshore wind at 12 m/s, gusts of 18 m/s for 60 s at 1.5 m"
+streamlit run app.py
+pytest
+```
+
+Generated files are written to `artifacts/`. Set a fixed random seed to reproduce an experiment.
+
+## Prompt examples
+
+```text
+steady wind at 8 m/s for 30 s at 1 m
+moderate offshore scenario, 12 m/s, gusts of 18 m/s for 2 min at 1500 mm
+vento forte de 45 km/h durante 90 s a 2 m
+```
+
+Internally, the project uses SI units. The current deterministic parser accepts `m/s`, `km/h`,
+seconds/minutes, and distances in `m` or `mm`.
+
+## Available hardware and integration decision
+
+The original proposal assumed a Raspberry Pi 5, Pixhawk, and MAVLink. The available prototype
+uses a Raspberry Pi 2B and a SpeedyBee F405 V4, generally associated with Betaflight/MSP. This
+version therefore does not pretend that MAVLink compatibility exists. The Raspberry Pi handles
+scenario generation, inference, logging, and supervision; the F405 remains responsible for the
+time-critical ESC signal.
+
+Python 3.12 is the project target. Confirm that it is available for the Raspberry Pi OS image and
+CPU architecture in use. The Pi 2 has limited resources, so model training should happen offline;
+only inference should run during control.
+
+## Repository structure
+
+```text
+NEURAL_OFFSHORE_WIND_LAB/
+├── app.py
+├── config/default.json
+├── docs/
+│   └── en/
+├── scripts/train_model.py
+├── src/labo_gerador_de_ventos/
+│   ├── control/
+│   ├── models/
+│   └── *.py
+├── tests/
+└── artifacts/
+```
+
+The internal Python package keeps its original Portuguese identifier for backward compatibility.
+
+## Safe experimental workflow
+
+1. Validate the full pipeline with the mock actuator.
+2. Use synthetic data only for software integration.
+3. Collect real measurements using an anemometer: distance, throttle/RPM, and measured wind.
+4. Retrain and validate the MLP using held-out real data.
+5. Test communication without a propeller and with current limiting.
+6. Enable physical output only after the hardware checklist has passed.
+
+## Scientific limitations
+
+Weibull describes wind-speed statistics; it is not CFD or a complete turbulence-spectrum model.
+The initial MLP learns a synthetic plant and is not a calibrated physical controller. Petrobras or
+industrial use requires traceable calibration, uncertainty analysis, independent risk assessment,
+sensor feedback, and validation against applicable standards.
+
+## Documentation
+
+- [System architecture](docs/en/architecture.md)
+- [Technical documentation](docs/en/technical.md)
+- [Hardware and safety](docs/en/hardware.md)
+- [Implementation plan](docs/en/implementation_plan.md)
+- [Roadmap](docs/en/roadmap.md)
+
