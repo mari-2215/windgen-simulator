@@ -6,6 +6,7 @@ from .actuator import (
     probe_betaflight,
     read_msp_v1_response,
 )
+from .neural_command import NeuralThrottleCommand, infer_safe_throttle
 
 __all__ = [
     "BetaflightMSPActuator",
@@ -14,4 +15,6 @@ __all__ = [
     "build_msp_v1_frame",
     "probe_betaflight",
     "read_msp_v1_response",
+    "NeuralThrottleCommand",
+    "infer_safe_throttle",
 ]

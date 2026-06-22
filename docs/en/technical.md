@@ -15,7 +15,7 @@ squared error. The output is normalized throttle from 0 to 1.
 
 The synthetic dataset approximates
 `throttle = sqrt(wind/28) * (1 + 0.13*distance) + noise`. This relationship is strictly didactic.
-A physical model must use anemometer measurements with the columns
+A physical model must be built using anemometer measurements with the columns
 `wind_mps,distance_m,throttle`, separate training/validation/test sessions, and uncertainty data.
 
 ## Phase 1 acceptance criteria
@@ -26,4 +26,3 @@ A physical model must use anemometer measurements with the columns
 - commands pass through ramp and saturation limits;
 - the physical backend cannot open a serial port without explicit opt-in;
 - all tests pass under Python 3.12.
-

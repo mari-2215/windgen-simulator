@@ -6,8 +6,8 @@ Projeto acadêmico - Fase 1 de um gerador de ventos inteligente para simular sé
 inspiradas em cenários offshore. O sistema interpreta um prompt em português, gera velocidades
 com distribuição de Weibull e usa uma rede neural MLP leve para estimar o comando de um motor.
 
-> **Segurança:** o modo padrão é `mock`. Nunca monte hélice para o primeiro ensaio. Use anteparo,
-> botão de emergência, limitação de corrente, fixação mecânica e supervisão presencial. A saída
+> **Segurança:** o modo padrão é `mock`, mantendo a hélice removida no primeiro ensaio e prevendo
+> anteparo, botão de emergência, limitação de corrente, fixação mecânica e supervisão presencial. A saída
 > experimental MSP deve ser validada contra a versão de Betaflight instalada antes de energizar
 > o ESC. Este software não é um sistema de segurança certificado.
 
@@ -54,15 +54,35 @@ presets documentados: leve 6 m/s, moderado 12 m/s e forte 18 m/s.
 O material de referência original cita Raspberry Pi 5, Pixhawk e MAVLink. O protótipo disponível
 usa Raspberry Pi 2B e SpeedyBee F405 V4, normalmente associada ao ecossistema Betaflight/MSP.
 Por isso, esta versão não usa PyMAVLink. O Pi executa geração, inferência e supervisão; a F405
-continua responsável pelo sinal temporizado ao ESC. Consulte [docs/hardware.md](docs/hardware.md).
+continua responsável pelo sinal temporizado ao ESC. A integração foi detalhada em [docs/hardware.md](docs/hardware.md).
 
-Para o primeiro teste com Raspberry Pi 2B, SpeedyBee F405 V4 e um motor, siga o roteiro
+Para o primeiro teste com Raspberry Pi 2B, SpeedyBee F405 V4 e um motor, foi preparado o roteiro
 [Bench Test 1 - teste de bancada e filmagem](docs/BENCH_TEST_1.pt-BR.md). O teste começa em `mock`, faz
 uma consulta MSP somente-leitura e só libera um giro curto após confirmações explícitas.
 
-Python 3.12 é a versão-alvo do projeto. Em Raspberry Pi OS, confirme a disponibilidade para a
-arquitetura/versão instalada; quando a imagem oficial oferecer outra versão, use container ou
-compile 3.12 conscientemente. O Pi 2 tem recursos limitados: evite retreinar durante o controle.
+## Localização do controle neural do motor
+
+O controle foi distribuído em camadas auditáveis:
+
+- `src/labo_gerador_de_ventos/models/mlp.py`: definindo, treinando e executando a MLP;
+- `src/labo_gerador_de_ventos/prompt.py`: convertendo o prompt em vento e distância;
+- `src/labo_gerador_de_ventos/control/neural_command.py`: transformando a previsão da MLP em
+  throttle e aplicando o teto independente do Bench Test 1;
+- `src/labo_gerador_de_ventos/control/actuator.py`: aplicando rampa, parada e quadro MSP;
+- `scripts/bench_test_1.py`: reunindo as camadas nos modos `neural-mock` e `neural-motor`.
+
+O caminho implementado ficou definido como:
+
+```text
+prompt -> parser -> MLP -> throttle previsto -> limite de 10% -> rampa -> F405/ESC -> motor
+```
+
+Por ter sido treinada com dados sintéticos, a MLP permaneceu classificada como demonstração de
+integração. A calibração física ficou reservada à coleta posterior com anemômetro.
+
+Python 3.12 é a versão-alvo do projeto. Em Raspberry Pi OS, a disponibilidade deverá ser confirmada
+para a arquitetura/versão instalada; oferecendo a imagem oficial outra versão, ficou previsto o
+uso de container ou compilação consciente do 3.12. No Pi 2, o retreinamento foi mantido fora do controle.
 
 ## Estrutura
 
@@ -82,12 +102,12 @@ NEURAL_OFFSHORE_WIND_LAB/
 
 ## Fluxo operacional seguro
 
-1. Execute e valide tudo em `mock`.
-2. Treine a MLP com dados sintéticos apenas para integração de software.
-3. Colete dados reais com anemômetro: distância, throttle/RPM e vento medido.
-4. Retreine e valide em dados separados; não use o sintético como calibração final.
-5. Teste sem hélice, com alimentação limitada e parada de emergência.
-6. Só então habilite o backend físico conforme `docs/hardware.md`.
+1. Executando e validando inicialmente em `mock`.
+2. Treinando a MLP sintética apenas para integração de software.
+3. Coletando com anemômetro: distância, throttle/RPM e vento medido.
+4. Retreinando e validando em dados separados, sem adotar o sintético como calibração final.
+5. Testando sem hélice, com alimentação limitada e parada de emergência.
+6. Habilitando o backend físico somente após as verificações de `docs/hardware.md`.
 
 ## Limitações científicas
 

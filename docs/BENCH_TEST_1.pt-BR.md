@@ -1,9 +1,10 @@
-# Bench Test 1 - teste de bancada e filmagem
+# Bench Test 1 - plano de teste de bancada e filmagem
 
-Este roteiro foi feito para o material disponível: Raspberry Pi 2B, SpeedyBee F405 V4 stack e um
-motor brushless outrunner. Ele não substitui a confirmação elétrica do motor, ESC e fonte.
+O protocolo foi estruturado considerando o material disponível: Raspberry Pi 2B, stack SpeedyBee
+F405 V4 e um motor brushless outrunner. A confirmação elétrica do motor, do ESC e da alimentação
+permaneceu estabelecida como condição de liberação do ensaio físico.
 
-## O que ainda é necessário
+## Mantendo os recursos necessários
 
 - fonte ou bateria compatível com a tensão do motor e do ESC, com corrente adequada;
 - cabo USB de dados entre Raspberry Pi e F405;
@@ -11,7 +12,8 @@ motor brushless outrunner. Ele não substitui a confirmação elétrica do motor
 - proteção física e meio de cortar a alimentação imediatamente;
 - **nenhuma hélice no primeiro teste**.
 
-Você informou que possui uma bateria de 12 V. Antes de conectá-la, registre:
+Foi registrada a disponibilidade de uma bateria nominal de 12 V. Antes da conexão, ficaram
+previstos os seguintes registros:
 
 - química da bateria (por exemplo, chumbo-ácido, Li-ion ou LiPo);
 - tensão totalmente carregada - uma bateria chamada “12 V” pode ultrapassar 12 V;
@@ -19,75 +21,95 @@ Você informou que possui uma bateria de 12 V. Antes de conectá-la, registre:
 - faixa de entrada impressa no ESC (em volts ou quantidade de células `S`);
 - faixa de tensão/células e KV do motor.
 
-Use a bateria somente se a tensão **máxima carregada** estiver dentro das faixas do ESC e do motor.
-Baterias de 12 V podem fornecer corrente suficiente para causar incêndio ou derreter cabos; use
-fusível adequado, conectores corretos e um corte de energia acessível. Não improvise ligação direta.
+O uso da bateria ficou condicionado à permanência da tensão **máxima carregada** dentro das faixas
+do ESC e do motor. Considerando a elevada corrente de falha possível em baterias de 12 V, foram
+previstos fusível adequado, conectores especificados e corte de energia acessível, sem ligações
+diretas improvisadas.
 
-Se você não souber o KV/tensão do motor ou a tensão/corrente da fonte, faça apenas `mock` e
-`serial-check`. Não ligue a potência do ESC por tentativa.
+Na ausência dos dados de KV/tensão do motor ou de tensão/corrente da alimentação, o plano ficou
+restrito aos modos `mock`, `neural-mock` e `serial-check`, mantendo a potência do ESC desligada.
 
-## 1. Preparar o Raspberry Pi
+## 1. Preparando o Raspberry Pi
 
 Na pasta do projeto:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pyserial
+pip install numpy pyserial
 export PYTHONPATH="$PWD/src"
 ```
 
-## 2. Teste sem hardware
+## 2. Executando o teste sem hardware
 
 ```bash
 python3 scripts/bench_test_1.py --mode mock
 ```
 
-Resultado esperado: `MOCK PASS`. Grave a tela mostrando a rampa de 0% a 10% e a parada.
+O resultado esperado foi definido como `MOCK PASS`, ficando registrada na tela a rampa de 0% a
+10% e o retorno a 0%.
 
-## 3. Detectar a F405 por USB
+## 3. Demonstrando a rede neural sem acionar o motor
 
-Conecte somente o USB da F405, sem alimentação de potência no ESC:
+```bash
+python3 scripts/bench_test_1.py \
+  --mode neural-mock \
+  --prompt "vento offshore de 6 m/s por 3 s a 1 m" \
+  --max-throttle 0.08
+```
+
+Durante essa etapa, o prompt foi convertido em velocidade e distância, a MLP calculou o throttle
+bruto e o limitador independente restringiu a saída a 8%. Nenhum comando físico foi transmitido.
+
+## 4. Detectando a F405 por USB
+
+Nessa etapa, foi prevista apenas a conexão USB da F405, mantendo a alimentação de potência do ESC
+desconectada:
 
 ```bash
 ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null
 python3 scripts/bench_test_1.py --mode serial-check --port /dev/ttyACM0
 ```
 
-O nome pode ser diferente. Resultado esperado: `SERIAL PASS` e a versão da API MSP. Se houver
-timeout, pare aqui e verifique cabo de dados, porta, permissões e configuração do firmware.
+O nome da porta poderá variar. O resultado esperado foi definido como `SERIAL PASS`, acompanhado
+da versão da API MSP. Ocorrendo timeout, o plano foi interrompido nessa etapa, seguindo-se a
+verificação do cabo de dados, porta, permissões e configuração do firmware.
 
-## 4. Giro curto sem hélice - somente após confirmar alimentação
+## 5. Preparando o giro neural curto e sem hélice
 
-1. Desligue tudo.
-2. Solde/conecte o motor à saída M1 do ESC conforme o manual do stack.
-3. Fixe o motor mecanicamente e mantenha a hélice removida.
-4. Conecte F405 e ESC pelo chicote original do stack.
-5. Prepare o corte físico de energia.
-6. Energize o ESC somente com fonte/bateria comprovadamente compatível.
+1. Mantendo todos os equipamentos desligados durante a montagem.
+2. Conectando o motor à saída M1 do ESC conforme o manual do stack.
+3. Fixando mecanicamente o motor e mantendo a hélice removida.
+4. Conectando F405 e ESC pelo chicote original do stack.
+5. Preparando o corte físico de energia antes da energização.
+6. Energizando o ESC somente após a compatibilidade da fonte/bateria ter sido comprovada.
 
 ```bash
 python3 scripts/bench_test_1.py \
-  --mode motor \
+  --mode neural-motor \
   --port /dev/ttyACM0 \
   --motor 1 \
   --max-throttle 0.08 \
-  --duration 3
+  --duration 3 \
+  --prompt "vento offshore de 6 m/s por 3 s a 1 m"
 ```
 
-O programa exigirá três confirmações digitadas. Ele limita o comando a 10%, limita a rampa e envia
-parada no bloco `finally`, inclusive após `Ctrl+C`. Ainda assim, mantenha a mão no corte físico.
+O programa exigirá três confirmações digitadas. O prompt será processado pela MLP, o resultado será
+limitado ao teto informado e encaminhado ao controle seguro. A rampa ficou limitada e a parada foi
+mantida no bloco `finally`, inclusive após `Ctrl+C`. O corte físico permaneceu acessível durante
+todo o ensaio.
 
-## Roteiro simples para o vídeo
+## Registrando o vídeo
 
-1. Mostre os componentes desligados e a hélice removida.
-2. Mostre a fixação do motor e identifique Raspberry Pi, F405 e ESC.
-3. Rode `mock` e mostre `MOCK PASS`.
-4. Rode `serial-check` e mostre `SERIAL PASS`.
-5. Se a alimentação estiver confirmada, filme o giro de três segundos e a parada automática.
-6. Mostre o terminal com `STOP SENT` e desligue a potência antes de tocar no sistema.
+1. Registrando os componentes desligados e a hélice removida.
+2. Registrando a fixação do motor e identificando Raspberry Pi, F405 e ESC.
+3. Executando `mock` e registrando `MOCK PASS`.
+4. Executando `neural-mock` e registrando o throttle bruto e o throttle limitado.
+5. Executando `serial-check` e registrando `SERIAL PASS`.
+6. Estando a alimentação confirmada, registrando o giro neural de três segundos e a parada.
+7. Registrando `STOP SENT` e desligando a potência antes de qualquer aproximação física.
 
-## Dados a anotar para a próxima atualização
+## Mantendo os dados para a próxima atualização
 
 - modelo e KV do motor;
 - modelo exato do ESC/stack;

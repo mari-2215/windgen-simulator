@@ -22,13 +22,12 @@ mode.
 
 ## Minimum commissioning sequence
 
-1. Record motor KV, ESC rating, supply voltage, and current limits.
-2. Confirm FC and ESC firmware and protocols.
-3. Validate serial communication while ESC power is disconnected.
-4. Verify an independent loss-of-communication shutdown.
-5. Energize without a propeller at the lowest current and command limits.
-6. Install shielding and the anemometer before low-energy airflow tests.
+1. Recording motor KV, ESC rating, supply voltage, and current limits.
+2. Confirming FC and ESC firmware and protocols.
+3. Validating serial communication while ESC power is disconnected.
+4. Verifying an independent loss-of-communication shutdown.
+5. Energizing without a propeller at the lowest current and command limits.
+6. Installing shielding and the anemometer before low-energy airflow tests.
 
 The environment variable `LABO_HARDWARE_ENABLE=EU_CONFIRMO_BANCADA_SEGURA` only unlocks the
 software path. It does not certify the test bench or replace a physical emergency stop.
-

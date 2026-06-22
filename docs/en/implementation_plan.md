@@ -25,7 +25,7 @@
 ## Stage 4 - Closed-loop control
 
 - add measured wind feedback;
-- use the MLP for feed-forward control and a supervisor for error correction;
+- using the MLP for feed-forward control and a supervisor for error correction;
 - validate overshoot, settling time, steady-state error, and shutdown behavior.
 
 ## Stage 5 - Academic validation
@@ -33,4 +33,3 @@
 - publish the experimental protocol, statistics, and traceability;
 - run endurance, thermal, vibration, and fault tests;
 - produce the final reproducible report and demonstration package.
-

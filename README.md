@@ -8,8 +8,8 @@ profile, generates a Weibull-based time series, and uses a lightweight neural ne
 the command for one brushless motor.
 
 > **Safety notice:** hardware control is disabled by default. Never perform initial tests with a
-> propeller installed. Use a physical emergency stop, current-limited power supply, mechanical
-> shielding, secure mounting, and direct supervision. The experimental MSP backend must be
+> propeller installed. A physical emergency stop, current-limited power supply, mechanical
+> shielding, secure mounting, and direct supervision were established as requirements. The experimental MSP backend must be
 > validated against the installed Betaflight version before the ESC is energized.
 
 ## Phase 1 deliverables
@@ -61,6 +61,19 @@ For the first Raspberry Pi 2B + SpeedyBee F405 V4 + one-motor test, see the Port
 [Bench Test 1 and filming guide](docs/BENCH_TEST_1.pt-BR.md). The workflow starts in mock
 mode, performs a read-only MSP probe, and only then permits a short, explicitly confirmed spin.
 
+## Neural motor-control implementation
+
+- `src/labo_gerador_de_ventos/models/mlp.py`: defining, training, and running the MLP;
+- `src/labo_gerador_de_ventos/prompt.py`: converting prompts into wind and distance values;
+- `src/labo_gerador_de_ventos/control/neural_command.py`: converting MLP output into a
+  safety-limited throttle command;
+- `src/labo_gerador_de_ventos/control/actuator.py`: applying the ramp, stop, and MSP frame;
+- `scripts/bench_test_1.py`: integrating the layers through `neural-mock` and `neural-motor`.
+
+```text
+prompt -> parser -> MLP -> predicted throttle -> 10% ceiling -> ramp -> F405/ESC -> motor
+```
+
 Python 3.12 is the project target. Confirm that it is available for the Raspberry Pi OS image and
 CPU architecture in use. The Pi 2 has limited resources, so model training should happen offline;
 only inference should run during control.
@@ -86,12 +99,12 @@ The internal Python package keeps its original Portuguese identifier for backwar
 
 ## Safe experimental workflow
 
-1. Validate the full pipeline with the mock actuator.
-2. Use synthetic data only for software integration.
-3. Collect real measurements using an anemometer: distance, throttle/RPM, and measured wind.
-4. Retrain and validate the MLP using held-out real data.
-5. Test communication without a propeller and with current limiting.
-6. Enable physical output only after the hardware checklist has passed.
+1. Validating the full pipeline with the mock actuator.
+2. Using synthetic data only for software integration.
+3. Collecting real measurements using an anemometer: distance, throttle/RPM, and measured wind.
+4. Retraining and validating the MLP using held-out real data.
+5. Testing communication without a propeller and with current limiting.
+6. Enabling physical output only after the hardware checklist has passed.
 
 ## Scientific limitations
 

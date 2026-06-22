@@ -15,8 +15,10 @@ from labo_gerador_de_ventos.control import (
     BetaflightMSPActuator,
     MockActuator,
     SafetyController,
+    infer_safe_throttle,
     probe_betaflight,
 )
+from labo_gerador_de_ventos.models.mlp import build_default_model
 
 
 def available_ports() -> list[str]:
@@ -53,6 +55,20 @@ def run_serial_check(port: str, baudrate: int) -> None:
     print("READ-ONLY CHECK: keep ESC power disconnected; USB to the F405 is enough.")
     protocol, major, minor = probe_betaflight(port, baudrate)
     print(f"SERIAL PASS: MSP protocol={protocol}, API={major}.{minor}, port={port}")
+
+
+def calculate_neural_command(prompt: str, safety_ceiling: float):
+    print("Loading the lightweight MLP and interpreting the prompt...")
+    model = build_default_model(seed=42, epochs=600)
+    command = infer_safe_throttle(prompt, model, safety_ceiling=safety_ceiling)
+    print(
+        "NEURAL COMMAND: "
+        f"wind={command.request.mean_mps:.2f} m/s, "
+        f"distance={command.request.distance_m:.2f} m, "
+        f"raw MLP={command.raw_throttle:.1%}, "
+        f"Bench Test 1 limit={command.limited_throttle:.1%}"
+    )
+    return command
 
 
 def typed_confirmation(prompt: str, expected: str) -> None:
@@ -95,22 +111,44 @@ def run_motor(port: str, baudrate: int, motor: int, maximum: float, duration_s: 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Neural Offshore Wind Lab - Bench Test 1")
-    parser.add_argument("--mode", choices=("mock", "serial-check", "motor"), default="mock")
+    parser.add_argument(
+        "--mode",
+        choices=("mock", "neural-mock", "serial-check", "motor", "neural-motor"),
+        default="mock",
+    )
     parser.add_argument("--port", help="Linux example: /dev/ttyACM0; Windows example: COM5")
     parser.add_argument("--baudrate", type=int, default=115200)
     parser.add_argument("--motor", type=int, choices=range(1, 9), default=1)
     parser.add_argument("--max-throttle", type=float, default=0.08)
     parser.add_argument("--duration", type=float, default=3.0)
+    parser.add_argument(
+        "--prompt",
+        default="vento offshore de 6 m/s por 3 s a 1 m",
+        help="wind scenario used by neural-mock and neural-motor",
+    )
     args = parser.parse_args()
 
     if args.mode == "mock":
         run_mock()
         return
+    if args.mode == "neural-mock":
+        calculate_neural_command(args.prompt, min(args.max_throttle, 0.10))
+        print("NEURAL MOCK PASS: no hardware output was generated.")
+        return
     port = require_port(args.port)
     if args.mode == "serial-check":
         run_serial_check(port, args.baudrate)
-    else:
+    elif args.mode == "motor":
         run_motor(port, args.baudrate, args.motor, args.max_throttle, args.duration)
+    else:
+        command = calculate_neural_command(args.prompt, min(args.max_throttle, 0.10))
+        run_motor(
+            port,
+            args.baudrate,
+            args.motor,
+            command.limited_throttle,
+            args.duration,
+        )
 
 
 if __name__ == "__main__":

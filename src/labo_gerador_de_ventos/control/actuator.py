@@ -90,7 +90,7 @@ class BetaflightMSPActuator:
 
     def __init__(self, port: str, baudrate: int = 115200, motor_index: int = 0) -> None:
         if os.getenv("LABO_HARDWARE_ENABLE") != self.ENABLE_TOKEN:
-            raise PermissionError("hardware bloqueado; leia docs/hardware.md")
+            raise PermissionError("hardware bloqueado; liberação descrita em docs/hardware.md")
         import serial
 
         if motor_index not in range(8):

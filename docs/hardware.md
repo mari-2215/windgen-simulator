@@ -16,7 +16,8 @@ níveis lógicos e documentação das placas. Remova hélice em testes de comuni
 O PDF original propõe Pixhawk/PyMAVLink. A F405 V4 com Betaflight usa outro ecossistema; o backend
 incluído envia um quadro MSP v1 compatível com o comando de motor usado historicamente pelo
 Betaflight, mas firmware, modo, mapeamento e permissões podem variar. Valide com a documentação e
-o configurador correspondentes à versão instalada. Se não houver confirmação, mantenha `mock`.
+o configurador correspondentes à versão instalada. Não havendo confirmação, o modo `mock` deverá
+ser mantido.
 
 ## Liberação experimental
 
@@ -38,4 +39,3 @@ O teto padrão de software é 30%, mas não substitui proteção elétrica/mecâ
 4. Validar parada por perda de comunicação.
 5. Energizar com corrente mínima, sem hélice, e testar rampa.
 6. Instalar anteparo e anemômetro; só então realizar coleta de baixa energia.
-
