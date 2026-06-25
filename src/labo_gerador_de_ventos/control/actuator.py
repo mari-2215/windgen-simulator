@@ -124,6 +124,11 @@ class SafetyController:
     _last: float = 0.0
     _last_time: float | None = None
 
+    @property
+    def current(self) -> float:
+        """Last throttle value applied by the safety controller."""
+        return self._last
+
     def command(self, requested: float, now: float | None = None) -> float:
         now = time.monotonic() if now is None else now
         requested = min(max(float(requested), self.minimum), self.maximum)
@@ -135,6 +140,23 @@ class SafetyController:
         self.actuator.set_throttle(applied)
         self._last, self._last_time = applied, now
         return applied
+
+    def ramp_to(
+        self,
+        target: float,
+        *,
+        step_interval_s: float = 0.1,
+        timeout_s: float = 8.0,
+    ) -> float:
+        """Move gradually toward a target using the configured slew-rate limit."""
+        target = min(max(float(target), self.minimum), self.maximum)
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
+            applied = self.command(target)
+            if abs(applied - target) <= 1e-4:
+                return applied
+            time.sleep(step_interval_s)
+        return self.current
 
     def emergency_stop(self) -> None:
         self.actuator.stop()

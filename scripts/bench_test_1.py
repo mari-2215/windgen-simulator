@@ -90,6 +90,7 @@ def run_motor(port: str, baudrate: int, motor: int, maximum: float, duration_s: 
     controller = SafetyController(actuator, maximum=maximum, max_delta_per_second=0.04)
     start = time.monotonic()
     print(f"Starting motor {motor}: ramping to {maximum:.1%} for at most {duration_s:.1f}s")
+    interrupted = False
     try:
         actuator.stop()
         while True:
@@ -100,9 +101,14 @@ def run_motor(port: str, baudrate: int, motor: int, maximum: float, duration_s: 
             print(f"\rElapsed {elapsed:4.1f}s | command {applied:5.1%}", end="", flush=True)
             time.sleep(0.1)
     except KeyboardInterrupt:
+        interrupted = True
         print("\nInterrupted by operator.")
     finally:
-        controller.emergency_stop()
+        if interrupted:
+            controller.emergency_stop()
+        else:
+            print("\nRamping down to 0% before final stop...")
+            controller.ramp_to(0.0, step_interval_s=0.1, timeout_s=5.0)
         time.sleep(0.2)
         actuator.stop()
         actuator.close()

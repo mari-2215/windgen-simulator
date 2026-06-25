@@ -95,9 +95,28 @@ python3 scripts/bench_test_1.py \
 ```
 
 O programa exigirá três confirmações digitadas. O prompt será processado pela MLP, o resultado será
-limitado ao teto informado e encaminhado ao controle seguro. A rampa ficou limitada e a parada foi
-mantida no bloco `finally`, inclusive após `Ctrl+C`. O corte físico permaneceu acessível durante
-todo o ensaio.
+limitado ao teto informado e encaminhado ao controle seguro. A rampa de partida foi limitada pelo
+controlador e a parada normal passou a usar desaceleração gradual até 0%. Em caso de `Ctrl+C` ou
+erro, a parada de emergência continuou sendo enviada imediatamente. O corte físico permaneceu
+acessível durante todo o ensaio.
+
+## Resultado registrado
+
+O Bench Test 1 foi registrado como **bem-sucedido**. O motor respeitou o throttle configurado e o
+tempo de execução definido no comando. A observação principal após o ensaio foi a necessidade de
+formalizar uma rampa de parada além da rampa inicial, melhoria incorporada ao script
+`scripts/bench_test_1.py`.
+
+Materiais registrados:
+
+- [vídeo do giro do Bench Test 1](media/bench-test-1-motor-run.mp4);
+- [dashboard - entrada do cenário](media/dashboard-input.png);
+- [dashboard - gráfico de velocidade](media/dashboard-plot.png);
+- [dashboard - tabela exportável](media/dashboard-table.png).
+
+![Dashboard com entrada do cenário](media/dashboard-input.png)
+
+![Dashboard com gráfico de velocidade do vento](media/dashboard-plot.png)
 
 ## Registrando o vídeo
 

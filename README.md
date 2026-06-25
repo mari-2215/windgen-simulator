@@ -61,6 +61,18 @@ For the first Raspberry Pi 2B + SpeedyBee F405 V4 + one-motor test, see the Port
 [Bench Test 1 and filming guide](docs/BENCH_TEST_1.pt-BR.md). The workflow starts in mock
 mode, performs a read-only MSP probe, and only then permits a short, explicitly confirmed spin.
 
+## Bench results
+
+Bench Test 1 was completed successfully: the motor respected the configured throttle ceiling and
+execution time. After the test, the normal shutdown path was updated to include a controlled ramp
+down to 0%, while immediate stop remains reserved for interruptions and failures.
+
+- [Results and observations - Portuguese](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
+- [Bench Test 2 gradient plan - Portuguese](docs/BENCH_TEST_2_PLAN.pt-BR.md)
+- [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
+
+![Simulator dashboard](docs/media/dashboard-plot.png)
+
 ## Neural motor-control implementation
 
 - `src/labo_gerador_de_ventos/models/mlp.py`: defining, training, and running the MLP;
@@ -69,6 +81,7 @@ mode, performs a read-only MSP probe, and only then permits a short, explicitly 
   safety-limited throttle command;
 - `src/labo_gerador_de_ventos/control/actuator.py`: applying the ramp, stop, and MSP frame;
 - `scripts/bench_test_1.py`: integrating the layers through `neural-mock` and `neural-motor`.
+- `scripts/bench_test_2.py`: preparing the gradient profile `0% -> 10% -> 60% -> 25% -> 0%`.
 
 ```text
 prompt -> parser -> MLP -> predicted throttle -> 10% ceiling -> ramp -> F405/ESC -> motor
@@ -105,6 +118,7 @@ The internal Python package keeps its original Portuguese identifier for backwar
 4. Retraining and validating the MLP using held-out real data.
 5. Testing communication without a propeller and with current limiting.
 6. Enabling physical output only after the hardware checklist has passed.
+7. Evolving the workflow into a dedicated application to reduce manual commands during bench tests.
 
 ## Scientific limitations
 

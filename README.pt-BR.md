@@ -60,6 +60,18 @@ Para o primeiro teste com Raspberry Pi 2B, SpeedyBee F405 V4 e um motor, foi pre
 [Bench Test 1 - teste de bancada e filmagem](docs/BENCH_TEST_1.pt-BR.md). O teste começa em `mock`, faz
 uma consulta MSP somente-leitura e só libera um giro curto após confirmações explícitas.
 
+## Resultados de bancada
+
+O Bench Test 1 foi concluído com sucesso: o motor respeitou o throttle definido e o tempo de
+execução configurado. Após o teste, o fluxo normal de parada foi atualizado para incluir rampa de
+desaceleração até 0%, mantendo parada imediata apenas para interrupções e falhas.
+
+- [Resultados e observações](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
+- [Plano do Bench Test 2 - gradiente 10%/60%/25%](docs/BENCH_TEST_2_PLAN.pt-BR.md)
+- [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
+
+![Dashboard do simulador](docs/media/dashboard-plot.png)
+
 ## Localização do controle neural do motor
 
 O controle foi distribuído em camadas auditáveis:
@@ -70,6 +82,7 @@ O controle foi distribuído em camadas auditáveis:
   throttle e aplicando o teto independente do Bench Test 1;
 - `src/labo_gerador_de_ventos/control/actuator.py`: aplicando rampa, parada e quadro MSP;
 - `scripts/bench_test_1.py`: reunindo as camadas nos modos `neural-mock` e `neural-motor`.
+- `scripts/bench_test_2.py`: preparando o perfil de gradiente `0% -> 10% -> 60% -> 25% -> 0%`.
 
 O caminho implementado ficou definido como:
 
@@ -108,6 +121,7 @@ NEURAL_OFFSHORE_WIND_LAB/
 4. Retreinando e validando em dados separados, sem adotar o sintético como calibração final.
 5. Testando sem hélice, com alimentação limitada e parada de emergência.
 6. Habilitando o backend físico somente após as verificações de `docs/hardware.md`.
+7. Evoluindo para um aplicativo dedicado, reduzindo comandos manuais durante ensaios de bancada.
 
 ## Limitações científicas
 

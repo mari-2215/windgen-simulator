@@ -3,6 +3,9 @@
 | Horizonte | Evolução | Resultado esperado |
 |---|---|---|
 | Fase 1 | Simulação, MLP sintética, UI e segurança básica | Pipeline demonstrável |
+| Fase 1.1 | Bench Test 1 com um motor | Giro curto validado com rampa de partida e parada |
+| Fase 1.2 | Bench Test 2 com gradiente | Perfil `10% -> 60% -> 25%` validado com logs |
+| Fase 1.3 | Aplicativo de bancada | Operação com botões, porta serial, logs e parada evidente |
 | Fase 2 | Anemômetro, LiDAR opcional e dataset real | Modelo calibrado |
 | Fase 3 | Controle feed-forward + PID e watchdog MCU | Malha fechada |
 | Fase 4 | Duto, colmeia de fluxo e instrumentação | Perfil espacial mais uniforme |
@@ -13,4 +16,3 @@
 
 Prioridades técnicas: segurança independente de software, qualidade dos dados, baseline físico
 comparável à MLP, inferência otimizada no Pi e rastreabilidade de cada ensaio.
-
