@@ -1,4 +1,4 @@
-# Bench Test 2 - plano de gradiente de throttle
+# Bench Test 2
 
 O Bench Test 2 foi definido como evolução direta do primeiro ensaio físico. A meta técnica passou a
 ser a validação de uma sequência com variação de gradiente:

@@ -67,7 +67,7 @@ execução configurado. Após o teste, o fluxo normal de parada foi atualizado p
 desaceleração até 0%, mantendo parada imediata apenas para interrupções e falhas.
 
 - [Resultados e observações](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
-- [Plano do Bench Test 2 - gradiente 10%/60%/25%](docs/BENCH_TEST_2_PLAN.pt-BR.md)
+- [Bench Test 2](docs/BENCH_TEST_2.pt-BR.md)
 - [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
 
 ![Dashboard do simulador](docs/media/dashboard-plot.png)

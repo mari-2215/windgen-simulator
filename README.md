@@ -68,7 +68,7 @@ execution time. After the test, the normal shutdown path was updated to include 
 down to 0%, while immediate stop remains reserved for interruptions and failures.
 
 - [Results and observations - Portuguese](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
-- [Bench Test 2 gradient plan - Portuguese](docs/BENCH_TEST_2_PLAN.pt-BR.md)
+- [Bench Test 2 - Portuguese](docs/BENCH_TEST_2.pt-BR.md)
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
 
 ![Simulator dashboard](docs/media/dashboard-plot.png)
