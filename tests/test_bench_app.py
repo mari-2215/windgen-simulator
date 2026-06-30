@@ -1,6 +1,7 @@
 from labo_gerador_de_ventos.bench_app import (
     BenchAppConfig,
     bench_log_markdown,
+    command_args,
     command_preview,
     profile_frame,
 )
@@ -38,3 +39,22 @@ def test_bench_app_exports_markdown_log() -> None:
     markdown = bench_log_markdown(config, "Teste simulado.")
     assert "# Bench Test 2 - registro de bancada" in markdown
     assert "Teste simulado." in markdown
+
+
+def test_bench_app_generates_real_motor_command_for_bench_test_3() -> None:
+    config = BenchAppConfig(
+        bench_test="Bench Test 3",
+        mode="motor",
+        port="/dev/ttyACM0",
+        motor=1,
+        max_throttle=1.0,
+        ramp_s=2.0,
+        hold_s=3.0,
+    )
+    args = command_args(config, python_executable="python3")
+    assert "--mode" in args
+    assert "motor" in args
+    assert "--allow-full-throttle" in args
+    assert "--confirm-secured" in args
+    assert "--confirm-supervision" in args
+    assert "--confirm-estop" in args

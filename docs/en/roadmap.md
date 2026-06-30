@@ -6,8 +6,8 @@
 | Phase 1.1 | Bench Test 1 with one motor | Short spin validated with start and stop ramps |
 | Phase 1.2 | Bench Test 2 with gradient | `10% -> 60% -> 25%` profile validated with logs |
 | Phase 1.3 | Bench Test 3 with 2 s ramps | Maximum throttle, RPM, neural commands, and endurance planned |
-| Phase 1.4 | Bench application v0 | Planning, plots, command previews, and logs |
-| Phase 1.5 | Connected bench application | Serial port, RPM reading, and visible stop |
+| Phase 1.4 | Operational bench application | Guarded Bench Test 3 execution, plots, commands, and logs |
+| Phase 1.5 | Instrumented bench application | RPM reading, wireless telemetry, and visible stop |
 | Phase 2 | Anemometer, optional LiDAR, real dataset | Calibrated model |
 | Phase 3 | Feed-forward plus feedback control and watchdog | Closed-loop prototype |
 | Phase 4 | Duct, flow straightener, instrumentation | More uniform spatial profile |

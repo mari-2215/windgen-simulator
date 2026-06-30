@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+
 import streamlit as st
 
 from labo_gerador_de_ventos.bench_app import (
     BenchAppConfig,
     bench_log_markdown,
+    command_args,
     command_preview,
+    command_timeout_s,
+    project_root,
     profile_frame,
 )
 from labo_gerador_de_ventos.models.mlp import build_default_model
@@ -15,10 +22,10 @@ from labo_gerador_de_ventos.simulation import simulate
 
 st.set_page_config(page_title="Neural Offshore Wind Lab", page_icon="🌬️", layout="wide")
 st.title("Neural Offshore Wind Lab")
-st.caption("Phase 1 / Fase 1 - Weibull + MLP | simulation and bench-planning mode")
+st.caption("Phase 1 / Fase 1 - Weibull + MLP | simulation and operational bench mode")
 st.warning(
-    "Hardware is disabled inside this app v0. Physical tests must remain under the guarded CLI "
-    "scripts and the hardware checklist."
+    "Physical motor execution is available only in guarded Bench Test 3 motor mode. Confirm the "
+    "laboratory setup before running any motor command."
 )
 
 
@@ -63,8 +70,8 @@ def render_simulation_tab() -> None:
 def render_bench_tab() -> None:
     st.subheader("Bench Tests")
     st.caption(
-        "Aplicativo de bancada v0: planejamento, perfil de throttle, comando pronto e registro. "
-        "Nenhum comando físico é enviado por esta tela."
+        "Aplicativo de bancada operacional: planejamento, perfil de throttle, comando pronto, "
+        "execução guardada do Bench Test 3 e registro."
     )
 
     col_left, col_right = st.columns([1, 1])
@@ -73,7 +80,7 @@ def render_bench_tab() -> None:
         mode_options = {
             "Bench Test 1": ["mock", "neural-mock", "serial-check", "physical-preview"],
             "Bench Test 2": ["mock", "physical-preview"],
-            "Bench Test 3": ["planning"],
+            "Bench Test 3": ["mock", "motor"],
         }
         mode = st.selectbox("Modo", mode_options[bench_test])
         port = st.text_input("Porta serial", "/dev/ttyACM0")
@@ -114,16 +121,54 @@ def render_bench_tab() -> None:
     st.line_chart(frame.set_index("time_s")[["throttle_percent"]])
     st.dataframe(frame, use_container_width=True)
 
-    if mode == "physical-preview":
+    if mode in ("physical-preview", "motor"):
         st.error(
-            "Este modo apenas gera o comando físico. A execução continua fora do app, com as "
-            "confirmações do script, hélice removida, proteção física e corte de energia."
+            "Modo físico. A bancada deve estar fixa, supervisionada e com corte de energia pronto. "
+            "Bench Test 3 pode executar o motor diretamente por esta tela."
         )
     else:
         st.success("Modo seguro: o comando gerado não aciona hardware físico.")
 
     command = command_preview(config)
     st.code(command, language="bash")
+
+    if bench_test == "Bench Test 3" and mode == "motor":
+        st.subheader("Execução física")
+        secured = st.checkbox("Motor preso, protegido e sem possibilidade de soltar a fixação")
+        supervised = st.checkbox("Supervisão de laboratório ativa")
+        estop = st.checkbox("Corte físico de energia pronto")
+        full_text = ""
+        if max_throttle > 0.60:
+            full_text = st.text_input(
+                "Confirmação para throttle acima de 60%",
+                placeholder="FULL_THROTTLE_APPROVED",
+            )
+        ready = secured and supervised and estop and (max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED")
+        if not ready:
+            st.info("A execução física será liberada após as confirmações de bancada.")
+        if st.button("Executar Bench Test 3 no motor", type="primary", disabled=not ready):
+            root = project_root()
+            env = os.environ.copy()
+            src_path = str(root / "src")
+            env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "")
+            with st.spinner("Executando Bench Test 3 no motor..."):
+                result = subprocess.run(
+                    command_args(config, python_executable=sys.executable),
+                    cwd=root,
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                    timeout=command_timeout_s(config),
+                    check=False,
+                )
+            if result.returncode == 0:
+                st.success("Bench Test 3 finalizado.")
+            else:
+                st.error(f"Bench Test 3 terminou com código {result.returncode}.")
+            if result.stdout:
+                st.text_area("Saída", result.stdout, height=220)
+            if result.stderr:
+                st.text_area("Erros", result.stderr, height=160)
 
     notes = st.text_area(
         "Registro do ensaio",

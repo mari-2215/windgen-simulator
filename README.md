@@ -18,7 +18,7 @@ the command for one brushless motor.
 - lightweight NumPy MLP: `(target wind speed, distance) -> throttle`;
 - controlled English and Portuguese prompt parsing without cloud services;
 - CSV export and PNG wind-speed plots;
-- Streamlit dashboard, bench-planning app v0, and command-line interface;
+- Streamlit dashboard, operational bench app, and command-line interface;
 - unit tests;
 - simulated actuator and opt-in experimental Betaflight/MSP backend;
 - system architecture, technical documentation, implementation plan, and roadmap.
@@ -39,8 +39,8 @@ pytest
 Generated files are written to `artifacts/`. Set a fixed random seed to reproduce an experiment.
 
 The app has two tabs: Weibull/MLP simulation and **Bench Tests**. The bench tab generates throttle
-profiles, plots them, prepares safe copy-ready commands, and exports Markdown/CSV records. The v0
-app does not send physical commands directly.
+profiles, plots them, prepares copy-ready commands, exports Markdown/CSV records, and runs Bench
+Test 3 on the motor after the laboratory confirmations are selected.
 
 ## Prompt examples
 
@@ -75,8 +75,8 @@ Bench Test 2 was also completed successfully, validating the gradient profile. B
 planned around a 2 s ramp up/down profile, maximum-throttle characterization, future RPM reading,
 neural-command testing, wireless communication, endurance testing, and a bench application.
 
-The bench application v0 is now part of `app.py`, keeping physical execution outside the interface
-while centralizing planning, profile visualization, command previews, and test records.
+The bench application is now part of `app.py`, centralizing planning, profile visualization,
+command previews, test records, and guarded physical execution for Bench Test 3.
 
 - [Results and observations - Portuguese](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
 - [Bench Test 2 - Portuguese](docs/BENCH_TEST_2.pt-BR.md)

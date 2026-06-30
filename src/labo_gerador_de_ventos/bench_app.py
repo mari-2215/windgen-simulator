@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import shlex
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 
@@ -54,40 +56,100 @@ def profile_frame(config: BenchAppConfig) -> pd.DataFrame:
 
 
 def command_preview(config: BenchAppConfig) -> str:
-    port = shlex.quote(config.port)
-    prompt = shlex.quote(config.prompt)
+    return " ".join(shlex.quote(part) for part in command_args(config, python_executable="python3"))
+
+
+def command_args(config: BenchAppConfig, *, python_executable: str | None = None) -> list[str]:
+    python = python_executable or sys.executable
     if config.bench_test == "Bench Test 1":
         if config.mode == "mock":
-            return "python3 scripts/bench_test_1.py --mode mock"
+            return [python, "scripts/bench_test_1.py", "--mode", "mock"]
         if config.mode == "neural-mock":
-            return (
-                "python3 scripts/bench_test_1.py "
-                f"--mode neural-mock --prompt {prompt} --max-throttle {config.max_throttle:.2f}"
-            )
+            return [
+                python,
+                "scripts/bench_test_1.py",
+                "--mode",
+                "neural-mock",
+                "--prompt",
+                config.prompt,
+                "--max-throttle",
+                f"{config.max_throttle:.2f}",
+            ]
         if config.mode == "serial-check":
-            return f"python3 scripts/bench_test_1.py --mode serial-check --port {port}"
-        if config.mode == "physical-preview":
-            return (
-                "python3 scripts/bench_test_1.py "
-                f"--mode neural-motor --port {port} --motor {config.motor} "
-                f"--max-throttle {min(config.max_throttle, 0.10):.2f} "
-                f"--duration {config.duration_s:.1f} --prompt {prompt}"
-            )
+            return [python, "scripts/bench_test_1.py", "--mode", "serial-check", "--port", config.port]
+        if config.mode in ("physical-preview", "motor"):
+            return [
+                python,
+                "scripts/bench_test_1.py",
+                "--mode",
+                "neural-motor",
+                "--port",
+                config.port,
+                "--motor",
+                str(config.motor),
+                "--max-throttle",
+                f"{min(config.max_throttle, 0.10):.2f}",
+                "--duration",
+                f"{config.duration_s:.1f}",
+                "--prompt",
+                config.prompt,
+            ]
     if config.bench_test == "Bench Test 2":
         if config.mode == "mock":
-            return "python3 scripts/bench_test_2.py --mode mock"
-        if config.mode == "physical-preview":
-            return (
-                "python3 scripts/bench_test_2.py "
-                f"--mode motor --port {port} --motor {config.motor} --allow-high-throttle"
-            )
+            return [python, "scripts/bench_test_2.py", "--mode", "mock"]
+        if config.mode in ("physical-preview", "motor"):
+            return [
+                python,
+                "scripts/bench_test_2.py",
+                "--mode",
+                "motor",
+                "--port",
+                config.port,
+                "--motor",
+                str(config.motor),
+                "--allow-high-throttle",
+            ]
     if config.bench_test == "Bench Test 3":
-        return (
-            "python3 scripts/bench_test_3.py "
-            f"--max-throttle {config.max_throttle:.2f} --ramp {config.ramp_s:.1f} "
-            f"--hold {config.hold_s:.1f} --sample-period {config.sample_period_s:.2f}"
-        )
+        args = [
+            python,
+            "scripts/bench_test_3.py",
+            "--mode",
+            "motor" if config.mode == "motor" else "mock",
+            "--max-throttle",
+            f"{config.max_throttle:.2f}",
+            "--ramp",
+            f"{config.ramp_s:.1f}",
+            "--hold",
+            f"{config.hold_s:.1f}",
+            "--sample-period",
+            f"{config.sample_period_s:.2f}",
+        ]
+        if config.mode == "motor":
+            args.extend(
+                [
+                    "--port",
+                    config.port,
+                    "--motor",
+                    str(config.motor),
+                    "--allow-full-throttle",
+                    "--confirm-secured",
+                    "--confirm-supervision",
+                    "--confirm-estop",
+                ]
+            )
+        return args
     raise ValueError(f"unsupported command mode: {config.bench_test} / {config.mode}")
+
+
+def command_timeout_s(config: BenchAppConfig) -> float:
+    if config.bench_test == "Bench Test 1":
+        return max(config.duration_s + 12.0, 20.0)
+    frame = profile_frame(config)
+    return float(frame.time_s.max() + 20.0)
+
+
+def project_root() -> Path:
+    return Path(__file__).resolve().parents[2]
 
 
 def bench_log_markdown(config: BenchAppConfig, notes: str) -> str:

@@ -13,11 +13,25 @@ O perfil base passa a usar rampa fixa de 2 s na subida e na descida:
 0% -> rampa de 2 s -> throttle máximo -> rampa de 2 s -> 0%
 ```
 
-O script de planejamento foi adicionado em `scripts/bench_test_3.py`. A execução padrão apenas
-imprime a trajetória prevista, sem enviar comando físico ao ESC.
+O script foi adicionado em `scripts/bench_test_3.py`. A execução padrão roda em `mock`, imprimindo
+a trajetória prevista sem enviar comando físico ao ESC. O modo `motor` envia comandos reais para a
+F405/ESC quando a bancada está confirmada.
 
 ```bash
-python3 scripts/bench_test_3.py --max-throttle 0.60 --ramp 2 --hold 3
+python3 scripts/bench_test_3.py --mode mock --max-throttle 0.60 --ramp 2 --hold 3
+```
+
+Execução física de bancada:
+
+```bash
+python3 scripts/bench_test_3.py \
+  --mode motor \
+  --port /dev/ttyACM0 \
+  --motor 1 \
+  --max-throttle 1.00 \
+  --ramp 2 \
+  --hold 3 \
+  --allow-full-throttle
 ```
 
 ## Escopo previsto
@@ -32,21 +46,20 @@ python3 scripts/bench_test_3.py --max-throttle 0.60 --ramp 2 --hold 3
 
 ## Diretrizes de segurança
 
-O teste de throttle máximo não ficou liberado como primeiro procedimento físico. A etapa física
-permanece condicionada a proteção mecânica, ausência de hélice, corte de energia, alimentação
-compatível e supervisão. O valor de throttle máximo deverá ser definido por etapa, começando por
-um limite conservador e aumentando somente após cada execução validada.
+O teste de throttle máximo ficou disponível para bancada supervisionada. A etapa física permanece
+condicionada a proteção mecânica, motor fixado, corte de energia, alimentação compatível e
+supervisão. Acima de 60%, o script exige liberação explícita de full throttle.
 
 ## Evolução para aplicativo
 
-O aplicativo de bancada v0 foi incorporado ao `app.py`. A primeira versão não envia comandos
-físicos diretamente; a função principal ficou concentrada em planejar o ensaio, visualizar o perfil,
-gerar o comando para execução controlada e exportar registros. A interface passou a concentrar:
+O aplicativo de bancada foi incorporado ao `app.py`. A interface planeja o ensaio, visualiza o
+perfil, gera o comando para execução controlada, exporta registros e executa o Bench Test 3 no
+motor após confirmações explícitas. A interface passou a concentrar:
 
 - seleção da porta serial;
 - escolha do perfil de teste;
 - campo de throttle máximo;
-- botões de iniciar, parar e emergência;
+- botão de execução física guardada para o Bench Test 3;
 - gráfico de throttle em tempo real;
 - leitura futura de RPM;
 - exportação automática de logs e CSV;
