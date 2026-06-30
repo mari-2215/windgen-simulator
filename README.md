@@ -67,9 +67,15 @@ Bench Test 1 was completed successfully: the motor respected the configured thro
 execution time. After the test, the normal shutdown path was updated to include a controlled ramp
 down to 0%, while immediate stop remains reserved for interruptions and failures.
 
+Bench Test 2 was also completed successfully, validating the gradient profile. Bench Test 3 is now
+planned around a 2 s ramp up/down profile, maximum-throttle characterization, future RPM reading,
+neural-command testing, wireless communication, endurance testing, and a bench application.
+
 - [Results and observations - Portuguese](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
 - [Bench Test 2 - Portuguese](docs/BENCH_TEST_2.pt-BR.md)
+- [Bench Test 3 - Portuguese](docs/BENCH_TEST_3.pt-BR.md)
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
+- [Bench Test 2 video](docs/media/bench-test-2-gradient-run.mp4)
 
 ![Simulator dashboard](docs/media/dashboard-plot.png)
 
@@ -82,6 +88,7 @@ down to 0%, while immediate stop remains reserved for interruptions and failures
 - `src/labo_gerador_de_ventos/control/actuator.py`: applying the ramp, stop, and MSP frame;
 - `scripts/bench_test_1.py`: integrating the layers through `neural-mock` and `neural-motor`.
 - `scripts/bench_test_2.py`: preparing the gradient profile `0% -> 10% -> 60% -> 25% -> 0%`.
+- `scripts/bench_test_3.py`: planning 2 s ramp up, maximum-throttle hold, and 2 s ramp down.
 
 ```text
 prompt -> parser -> MLP -> predicted throttle -> 10% ceiling -> ramp -> F405/ESC -> motor

@@ -30,6 +30,16 @@ python3 scripts/bench_test_2.py --mode mock
 
 A execução em `mock` imprime os alvos e valores aplicados sem enviar comando físico ao ESC.
 
+## Resultado registrado
+
+O Bench Test 2 foi registrado como **bem-sucedido**. A sequência de gradiente foi executada como
+continuidade do Bench Test 1, validando a transição entre patamares de throttle e mantendo a lógica
+de rampa controlada.
+
+Mídia registrada:
+
+- [vídeo do Bench Test 2](media/bench-test-2-gradient-run.mp4).
+
 ## Execução física, mantida bloqueada por padrão
 
 Como o perfil alcança 60% de throttle, a execução física ficou condicionada a liberação explícita,

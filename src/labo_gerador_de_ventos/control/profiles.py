@@ -23,6 +23,25 @@ BENCH_TEST_2_PROFILE: tuple[ControlPoint, ...] = (
 )
 
 
+def build_bench_test_3_profile(
+    *,
+    max_throttle: float,
+    ramp_s: float = 2.0,
+    hold_s: float = 3.0,
+) -> tuple[ControlPoint, ...]:
+    """Build the Bench Test 3 profile with fixed up/down ramp duration."""
+    if not 0.0 < max_throttle <= 1.0:
+        raise ValueError("max_throttle must stay within (0, 1]")
+    if ramp_s <= 0.0 or hold_s <= 0.0:
+        raise ValueError("ramp_s and hold_s must be positive")
+    return (
+        ControlPoint(0.0, 0.00),
+        ControlPoint(ramp_s, max_throttle),
+        ControlPoint(ramp_s + hold_s, max_throttle),
+        ControlPoint(2.0 * ramp_s + hold_s, 0.00),
+    )
+
+
 def interpolate_profile(
     points: tuple[ControlPoint, ...],
     *,
