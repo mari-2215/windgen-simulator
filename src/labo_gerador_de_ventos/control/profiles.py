@@ -11,6 +11,16 @@ class ControlPoint:
     throttle: float
 
 
+BENCH_TEST_1_PROFILE: tuple[ControlPoint, ...] = (
+    ControlPoint(0.0, 0.00),
+    ControlPoint(1.0, 0.05),
+    ControlPoint(2.0, 0.10),
+    ControlPoint(3.0, 0.10),
+    ControlPoint(4.0, 0.05),
+    ControlPoint(5.0, 0.00),
+)
+
+
 BENCH_TEST_2_PROFILE: tuple[ControlPoint, ...] = (
     ControlPoint(0.0, 0.00),
     ControlPoint(3.0, 0.10),

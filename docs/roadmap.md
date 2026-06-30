@@ -6,7 +6,8 @@
 | Fase 1.1 | Bench Test 1 com um motor | Giro curto validado com rampa de partida e parada |
 | Fase 1.2 | Bench Test 2 com gradiente | Perfil `10% -> 60% -> 25%` validado com logs |
 | Fase 1.3 | Bench Test 3 com rampa de 2 s | Throttle máximo, RPM, comandos neurais e exaustão planejados |
-| Fase 1.4 | Aplicativo de bancada | Operação com botões, porta serial, logs e parada evidente |
+| Fase 1.4 | Aplicativo de bancada v0 | Planejamento, gráficos, comandos prontos e logs |
+| Fase 1.5 | Aplicativo com comunicação | Porta serial, leitura de RPM e parada evidente |
 | Fase 2 | Anemômetro, LiDAR opcional e dataset real | Modelo calibrado |
 | Fase 3 | Controle feed-forward + PID e watchdog MCU | Malha fechada |
 | Fase 4 | Duto, colmeia de fluxo e instrumentação | Perfil espacial mais uniforme |

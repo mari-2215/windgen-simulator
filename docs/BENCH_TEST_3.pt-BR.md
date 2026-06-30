@@ -39,8 +39,9 @@ um limite conservador e aumentando somente após cada execução validada.
 
 ## Evolução para aplicativo
 
-O aplicativo de bancada foi definido como prioridade operacional após o Bench Test 2. A interface
-prevista deverá concentrar:
+O aplicativo de bancada v0 foi incorporado ao `app.py`. A primeira versão não envia comandos
+físicos diretamente; a função principal ficou concentrada em planejar o ensaio, visualizar o perfil,
+gerar o comando para execução controlada e exportar registros. A interface passou a concentrar:
 
 - seleção da porta serial;
 - escolha do perfil de teste;
@@ -50,3 +51,9 @@ prevista deverá concentrar:
 - leitura futura de RPM;
 - exportação automática de logs e CSV;
 - registro das mídias associadas a cada ensaio.
+
+Execução:
+
+```bash
+streamlit run app.py
+```

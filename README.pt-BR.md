@@ -17,7 +17,7 @@ com distribuição de Weibull e usa uma rede neural MLP leve para estimar o coma
 - MLP NumPy treinada como modelo inverso `(vento desejado, distância) -> throttle`;
 - interpretação controlada de prompts, sem depender de serviço externo;
 - CSV e gráfico PNG;
-- dashboard Streamlit;
+- dashboard Streamlit com simulação e app de bancada v0;
 - CLI e testes unitários;
 - atuador simulado e backend MSP/Betaflight experimental, bloqueado por padrão;
 - documentação de arquitetura, hardware, implementação e roadmap.
@@ -37,6 +37,10 @@ pytest
 
 Os artefatos são gravados em `artifacts/`. A semente aleatória pode ser fixada por CLI ou no
 dashboard para permitir repetição do experimento.
+
+O app possui duas abas: simulação Weibull/MLP e **Bench Tests**. A aba de bancada gera o perfil de
+throttle, mostra o gráfico, monta o comando seguro para copiar e exporta registros em Markdown/CSV.
+Nenhum comando físico é enviado diretamente pelo app v0.
 
 ## Exemplos de prompt
 
@@ -70,6 +74,9 @@ O Bench Test 2 também foi concluído com sucesso, validando o perfil com mudan�
 Bench Test 3 ficou planejado com rampa de 2 s para subida e descida, teste de throttle máximo,
 leitura futura de RPM, comandos por redes neurais, comunicação sem fio, teste de exaustão e
 evolução para aplicativo de bancada.
+
+O aplicativo de bancada v0 foi incorporado ao `app.py`, mantendo execução física fora da interface
+e concentrando planejamento, visualização do perfil, comando pronto e registro do ensaio.
 
 - [Resultados e observações](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
 - [Bench Test 2](docs/BENCH_TEST_2.pt-BR.md)

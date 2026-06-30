@@ -20,6 +20,7 @@ sequência com patamares intermediários de throttle.
 - O perfil do Bench Test 2 foi preparado com a sequência `rampa -> 10% -> 60% -> 25% -> rampa`.
 - O Bench Test 2 foi registrado como concluído e passou a compor a trilha experimental do projeto.
 - O Bench Test 3 foi estruturado como próxima etapa, com rampa de 2 s para subida e descida.
+- O aplicativo de bancada v0 foi adicionado ao dashboard Streamlit, sem acionamento físico direto.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.

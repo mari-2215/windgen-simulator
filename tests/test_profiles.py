@@ -1,6 +1,7 @@
 import pytest
 
 from labo_gerador_de_ventos.control import (
+    BENCH_TEST_1_PROFILE,
     BENCH_TEST_2_PROFILE,
     build_bench_test_3_profile,
     interpolate_profile,
@@ -13,6 +14,12 @@ def test_bench_test_2_profile_contains_requested_gradient() -> None:
     assert 0.60 in throttles
     assert 0.25 in throttles
     assert throttles[-1] == 0.0
+
+
+def test_bench_test_1_profile_keeps_short_safe_ramp() -> None:
+    assert BENCH_TEST_1_PROFILE[0].throttle == 0.0
+    assert max(point.throttle for point in BENCH_TEST_1_PROFILE) == pytest.approx(0.10)
+    assert BENCH_TEST_1_PROFILE[-1].throttle == 0.0
 
 
 def test_interpolate_profile_samples_endpoints() -> None:
