@@ -28,6 +28,8 @@ class BenchAppConfig:
     hold_s: float = 3.0
     sample_period_s: float = 0.25
     prompt: str = "vento offshore de 6 m/s por 3 s a 1 m"
+    layout: str = "cross"
+    motor_count: int = 1
 
 
 def profile_points(config: BenchAppConfig) -> tuple[ControlPoint, ...]:
@@ -40,6 +42,12 @@ def profile_points(config: BenchAppConfig) -> tuple[ControlPoint, ...]:
             max_throttle=config.max_throttle,
             ramp_s=config.ramp_s,
             hold_s=config.hold_s,
+        )
+    if config.bench_test == "Bench Test 4":
+        return build_bench_test_3_profile(
+            max_throttle=config.max_throttle,
+            ramp_s=config.ramp_s,
+            hold_s=config.duration_s,
         )
     raise ValueError(f"unknown bench test: {config.bench_test}")
 
@@ -132,6 +140,38 @@ def command_args(config: BenchAppConfig, *, python_executable: str | None = None
                     "--motor",
                     str(config.motor),
                     "--allow-full-throttle",
+                    "--confirm-secured",
+                    "--confirm-supervision",
+                    "--confirm-estop",
+                ]
+            )
+        return args
+    if config.bench_test == "Bench Test 4":
+        args = [
+            python,
+            "scripts/bench_test_4.py",
+            "--mode",
+            "motor" if config.mode == "motor" else "mock",
+            "--prompt",
+            config.prompt,
+            "--layout",
+            config.layout,
+            "--motor-count",
+            str(config.motor_count),
+            "--max-throttle",
+            f"{config.max_throttle:.2f}",
+            "--duration",
+            f"{config.duration_s:.1f}",
+            "--ramp",
+            f"{config.ramp_s:.1f}",
+            "--sample-period",
+            f"{config.sample_period_s:.2f}",
+        ]
+        if config.mode == "motor":
+            args.extend(
+                [
+                    "--port",
+                    config.port,
                     "--confirm-secured",
                     "--confirm-supervision",
                     "--confirm-estop",

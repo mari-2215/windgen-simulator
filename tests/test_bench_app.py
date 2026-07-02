@@ -58,3 +58,22 @@ def test_bench_app_generates_real_motor_command_for_bench_test_3() -> None:
     assert "--confirm-secured" in args
     assert "--confirm-supervision" in args
     assert "--confirm-estop" in args
+
+
+def test_bench_app_generates_bench_test_4_neural_motor_command() -> None:
+    config = BenchAppConfig(
+        bench_test="Bench Test 4",
+        mode="motor",
+        prompt="vento offshore de 12 m/s por 10 min a 1 m",
+        layout="x",
+        motor_count=4,
+        duration_s=600.0,
+        max_throttle=1.0,
+    )
+    args = command_args(config, python_executable="python3")
+    assert "scripts/bench_test_4.py" in args
+    assert "--prompt" in args
+    assert "--layout" in args
+    assert "x" in args
+    assert "--motor-count" in args
+    assert "4" in args

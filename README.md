@@ -71,9 +71,9 @@ Bench Test 1 was completed successfully: the motor respected the configured thro
 execution time. After the test, the normal shutdown path was updated to include a controlled ramp
 down to 0%, while immediate stop remains reserved for interruptions and failures.
 
-Bench Test 2 was also completed successfully, validating the gradient profile. Bench Test 3 is now
-planned around a 2 s ramp up/down profile, maximum-throttle characterization, future RPM reading,
-neural-command testing, wireless communication, endurance testing, and a bench application.
+Bench Test 2 was also completed successfully, validating the gradient profile. Bench Test 3 was
+completed successfully, with 61 samples showing the best shutdown-ramp behavior. Bench Test 4 now
+targets endurance testing, prompt-based neural commands, 1-4 motor layouts, and RPM records.
 
 The bench application is now part of `app.py`, centralizing planning, profile visualization,
 command previews, test records, and guarded physical execution for Bench Test 3.
@@ -81,6 +81,7 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - [Results and observations - Portuguese](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
 - [Bench Test 2 - Portuguese](docs/BENCH_TEST_2.pt-BR.md)
 - [Bench Test 3 - Portuguese](docs/BENCH_TEST_3.pt-BR.md)
+- [Bench Test 4 - Portuguese](docs/BENCH_TEST_4.pt-BR.md)
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
 - [Bench Test 2 video](docs/media/bench-test-2-gradient-run.mp4)
 
@@ -96,6 +97,8 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - `scripts/bench_test_1.py`: integrating the layers through `neural-mock` and `neural-motor`.
 - `scripts/bench_test_2.py`: preparing the gradient profile `0% -> 10% -> 60% -> 25% -> 0%`.
 - `scripts/bench_test_3.py`: planning 2 s ramp up, maximum-throttle hold, and 2 s ramp down.
+- `scripts/bench_test_4.py`: running prompt-based neural endurance tests for 1-4 motor layouts.
+- `src/labo_gerador_de_ventos/control/neural_array.py`: distributing neural throttle by position.
 
 ```text
 prompt -> parser -> MLP -> predicted throttle -> 10% ceiling -> ramp -> F405/ESC -> motor

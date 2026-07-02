@@ -13,6 +13,18 @@ O segundo ensaio de bancada foi concluído com sucesso. A execução registrou a
 para um perfil com mudança de gradiente, avançando do giro curto em baixa potência para uma
 sequência com patamares intermediários de throttle.
 
+## Bench Test 3
+
+O terceiro ensaio de bancada foi concluído com sucesso. A configuração com 61 amostras apresentou
+melhor resposta na rampa de finalização, sem movimento residual perceptível. O resultado passou a
+servir como referência para os perfis seguintes.
+
+## Bench Test 4
+
+O Bench Test 4 foi estruturado como ensaio de exaustão e comando neural por prompt. A duração-alvo
+foi definida em torno de 10 minutos, com preparação para layout de 1 a 4 motores em cruz ou em X e
+registro de RPM.
+
 ## Melhorias incorporadas
 
 - A rampa de parada foi adicionada ao fluxo normal do `scripts/bench_test_1.py`.
@@ -21,6 +33,7 @@ sequência com patamares intermediários de throttle.
 - O Bench Test 2 foi registrado como concluído e passou a compor a trilha experimental do projeto.
 - O Bench Test 3 foi estruturado como próxima etapa, com rampa de 2 s para subida e descida.
 - O aplicativo de bancada foi atualizado para execução física guardada do Bench Test 3.
+- O Bench Test 4 foi adicionado com comando por prompt neural, duração longa e layout multimotor.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.

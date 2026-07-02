@@ -23,6 +23,17 @@ class MockActuator:
         self.commands.append(0.0)
 
 
+class MockMultiMotorActuator:
+    def __init__(self) -> None:
+        self.commands: list[dict[int, float]] = []
+
+    def set_throttles(self, values: dict[int, float]) -> None:
+        self.commands.append({int(motor): float(value) for motor, value in values.items()})
+
+    def stop(self) -> None:
+        self.commands.append({})
+
+
 def build_msp_v1_frame(command: int, payload: bytes = b"") -> bytes:
     """Build a host-to-flight-controller MSP v1 frame."""
     if not 0 <= command <= 255 or len(payload) > 255:
@@ -106,6 +117,39 @@ class BetaflightMSPActuator:
         value = min(max(float(value), 0.0), 1.0)
         motors = [1000] * 8
         motors[self.motor_index] = int(round(1000 + 1000 * value))
+        self._send(self.MSP_SET_MOTOR, struct.pack("<8H", *motors))
+
+    def stop(self) -> None:
+        self._send(self.MSP_SET_MOTOR, struct.pack("<8H", *([1000] * 8)))
+
+    def close(self) -> None:
+        self.serial.close()
+
+
+class BetaflightMSPMultiMotorActuator:
+    """Experimental MSP v1 backend for multiple motor outputs."""
+
+    MSP_SET_MOTOR = 214
+    ENABLE_TOKEN = BetaflightMSPActuator.ENABLE_TOKEN
+
+    def __init__(self, port: str, baudrate: int = 115200) -> None:
+        if os.getenv("LABO_HARDWARE_ENABLE") != self.ENABLE_TOKEN:
+            raise PermissionError("hardware bloqueado; liberação descrita em docs/hardware.md")
+        import serial
+
+        self.serial = serial.Serial(port, baudrate=baudrate, timeout=0.2)
+
+    def _send(self, command: int, payload: bytes) -> None:
+        self.serial.write(build_msp_v1_frame(command, payload))
+        self.serial.flush()
+
+    def set_throttles(self, values: dict[int, float]) -> None:
+        motors = [1000] * 8
+        for motor, value in values.items():
+            if motor not in range(1, 9):
+                raise ValueError("motor must be in 1..8")
+            value = min(max(float(value), 0.0), 1.0)
+            motors[motor - 1] = int(round(1000 + 1000 * value))
         self._send(self.MSP_SET_MOTOR, struct.pack("<8H", *motors))
 
     def stop(self) -> None:

@@ -71,9 +71,9 @@ execução configurado. Após o teste, o fluxo normal de parada foi atualizado p
 desaceleração até 0%, mantendo parada imediata apenas para interrupções e falhas.
 
 O Bench Test 2 também foi concluído com sucesso, validando o perfil com mudança de gradiente. O
-Bench Test 3 ficou planejado com rampa de 2 s para subida e descida, teste de throttle máximo,
-leitura futura de RPM, comandos por redes neurais, comunicação sem fio, teste de exaustão e
-evolução para aplicativo de bancada.
+Bench Test 3 foi concluído com sucesso, registrando melhor comportamento com 61 amostras na rampa
+de finalização. O Bench Test 4 ficou estruturado para teste de exaustão, comando por prompt neural,
+layout de 1 a 4 motores e registro de RPM.
 
 O aplicativo de bancada foi incorporado ao `app.py`, concentrando planejamento, visualização do
 perfil, comando pronto, registro do ensaio e execução física guardada do Bench Test 3.
@@ -81,6 +81,7 @@ perfil, comando pronto, registro do ensaio e execução física guardada do Benc
 - [Resultados e observações](docs/RESULTS_AND_OBSERVATIONS.pt-BR.md)
 - [Bench Test 2](docs/BENCH_TEST_2.pt-BR.md)
 - [Bench Test 3](docs/BENCH_TEST_3.pt-BR.md)
+- [Bench Test 4](docs/BENCH_TEST_4.pt-BR.md)
 - [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](docs/media/bench-test-2-gradient-run.mp4)
 
@@ -98,6 +99,8 @@ O controle foi distribuído em camadas auditáveis:
 - `scripts/bench_test_1.py`: reunindo as camadas nos modos `neural-mock` e `neural-motor`.
 - `scripts/bench_test_2.py`: preparando o perfil de gradiente `0% -> 10% -> 60% -> 25% -> 0%`.
 - `scripts/bench_test_3.py`: planejando rampa de 2 s, patamar de throttle máximo e descida de 2 s.
+- `scripts/bench_test_4.py`: executando comando neural por prompt, exaustão e layout 1-4 motores.
+- `src/labo_gerador_de_ventos/control/neural_array.py`: distribuindo throttle neural por posição.
 
 O caminho implementado ficou definido como:
 

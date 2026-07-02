@@ -1,9 +1,12 @@
 # Bench Test 3
 
-O Bench Test 3 foi definido como a próxima etapa de bancada após a validação do perfil de gradiente
-do Bench Test 2. A proposta passou a concentrar a transição do projeto para um controle mais
-instrumentado, preparando coleta de RPM, testes por rede neural e uma operação menos dependente de
-linha de comando.
+O Bench Test 3 foi concluído com sucesso após a validação do perfil de gradiente do Bench Test 2.
+A execução confirmou o uso de rampa de 2 s para subida e descida, incluindo teste de throttle
+máximo em bancada supervisionada.
+
+Uma observação importante foi registrada: a taxa de amostragem com **61 amostras** apresentou melhor
+comportamento na finalização, sem movimento residual perceptível na rampa de parada. Esse resultado
+passou a orientar os perfis seguintes.
 
 ## Objetivo técnico
 
@@ -36,13 +39,10 @@ python3 scripts/bench_test_3.py \
 
 ## Escopo previsto
 
-- validar a rampa de 2 s para subida e descida;
-- testar o throttle máximo definido para a bancada;
-- evoluir a operação para um aplicativo dedicado;
-- estudar comunicação sem fio entre interface, Raspberry Pi e controlador;
-- adicionar leitura de RPM para registrar resposta do motor;
-- testar comandos gerados por redes neurais;
-- iniciar teste de exaustão, mantendo logs de duração, temperatura percebida, estabilidade e falhas.
+- rampa de 2 s para subida e descida validada;
+- throttle máximo testado em bancada;
+- aplicativo de bancada atualizado para execução física guardada;
+- base preparada para o Bench Test 4, com comando por prompt neural e ensaio de exaustão.
 
 ## Diretrizes de segurança
 

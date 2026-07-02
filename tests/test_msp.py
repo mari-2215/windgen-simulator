@@ -1,6 +1,10 @@
 import pytest
 
-from labo_gerador_de_ventos.control import build_msp_v1_frame, read_msp_v1_response
+from labo_gerador_de_ventos.control import (
+    MockMultiMotorActuator,
+    build_msp_v1_frame,
+    read_msp_v1_response,
+)
 
 
 class FakeSerial:
@@ -33,3 +37,10 @@ def test_bad_checksum_fails() -> None:
     with pytest.raises(RuntimeError, match="checksum"):
         read_msp_v1_response(FakeSerial(b"$M>\x00\x01\x00"), 1)
 
+
+def test_mock_multi_motor_actuator_records_mapping() -> None:
+    actuator = MockMultiMotorActuator()
+    actuator.set_throttles({1: 0.5, 4: 0.25})
+    actuator.stop()
+    assert actuator.commands[0] == {1: 0.5, 4: 0.25}
+    assert actuator.commands[-1] == {}

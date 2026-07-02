@@ -76,27 +76,34 @@ def render_bench_tab() -> None:
 
     col_left, col_right = st.columns([1, 1])
     with col_left:
-        bench_test = st.selectbox("Teste", ["Bench Test 1", "Bench Test 2", "Bench Test 3"])
+        bench_test = st.selectbox(
+            "Teste",
+            ["Bench Test 1", "Bench Test 2", "Bench Test 3", "Bench Test 4"],
+        )
         mode_options = {
             "Bench Test 1": ["mock", "neural-mock", "serial-check", "physical-preview"],
             "Bench Test 2": ["mock", "physical-preview"],
             "Bench Test 3": ["mock", "motor"],
+            "Bench Test 4": ["mock", "motor"],
         }
         mode = st.selectbox("Modo", mode_options[bench_test])
         port = st.text_input("Porta serial", "/dev/ttyACM0")
         motor = st.number_input("Motor", min_value=1, max_value=8, value=1, step=1)
+        motor_count = st.number_input("Quantidade de motores no arranjo", 1, 4, 1, 1)
+        layout = st.selectbox("Layout do arranjo", ["cross", "x"])
 
     with col_right:
         max_default = 0.08 if bench_test == "Bench Test 1" else 0.60
         max_throttle = st.slider("Throttle máximo", 0.01, 1.0, max_default, 0.01)
         duration_s = st.number_input("Duração do Bench Test 1 (s)", 1.0, 10.0, 3.0, 0.5)
+        endurance_s = st.number_input("Duração do Bench Test 4 (s)", 10.0, 900.0, 600.0, 10.0)
         ramp_s = st.number_input("Rampa do Bench Test 3 (s)", 0.5, 10.0, 2.0, 0.5)
         hold_s = st.number_input("Patamar do Bench Test 3 (s)", 0.5, 30.0, 3.0, 0.5)
         sample_period_s = st.number_input("Amostragem do perfil (s)", 0.05, 2.0, 0.25, 0.05)
 
     prompt = st.text_area(
-        "Prompt neural para Bench Test 1",
-        "vento offshore de 6 m/s por 3 s a 1 m",
+        "Prompt neural",
+        "vento offshore de 12 m/s por 10 min a 1 m",
     )
 
     config = BenchAppConfig(
@@ -105,11 +112,13 @@ def render_bench_tab() -> None:
         port=port,
         motor=int(motor),
         max_throttle=float(max_throttle),
-        duration_s=float(duration_s),
+        duration_s=float(endurance_s if bench_test == "Bench Test 4" else duration_s),
         ramp_s=float(ramp_s),
         hold_s=float(hold_s),
         sample_period_s=float(sample_period_s),
         prompt=prompt,
+        layout=layout,
+        motor_count=int(motor_count),
     )
 
     frame = profile_frame(config)
@@ -132,9 +141,9 @@ def render_bench_tab() -> None:
     command = command_preview(config)
     st.code(command, language="bash")
 
-    if bench_test == "Bench Test 3" and mode == "motor":
+    if bench_test in ("Bench Test 3", "Bench Test 4") and mode == "motor":
         st.subheader("Execução física")
-        secured = st.checkbox("Motor preso, protegido e sem possibilidade de soltar a fixação")
+        secured = st.checkbox("Motor/arranjo preso, protegido e sem possibilidade de soltar a fixação")
         supervised = st.checkbox("Supervisão de laboratório ativa")
         estop = st.checkbox("Corte físico de energia pronto")
         full_text = ""
@@ -146,7 +155,7 @@ def render_bench_tab() -> None:
         ready = secured and supervised and estop and (max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED")
         if not ready:
             st.info("A execução física será liberada após as confirmações de bancada.")
-        if st.button("Executar Bench Test 3 no motor", type="primary", disabled=not ready):
+        if st.button(f"Executar {bench_test} no motor", type="primary", disabled=not ready):
             root = project_root()
             env = os.environ.copy()
             src_path = str(root / "src")
@@ -162,9 +171,9 @@ def render_bench_tab() -> None:
                     check=False,
                 )
             if result.returncode == 0:
-                st.success("Bench Test 3 finalizado.")
+                st.success(f"{bench_test} finalizado.")
             else:
-                st.error(f"Bench Test 3 terminou com código {result.returncode}.")
+                st.error(f"{bench_test} terminou com código {result.returncode}.")
             if result.stdout:
                 st.text_area("Saída", result.stdout, height=220)
             if result.stderr:
