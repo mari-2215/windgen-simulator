@@ -15,7 +15,7 @@ the command for one brushless motor.
 ## Phase 1 deliverables
 
 - reproducible Weibull wind generator with gusts and temporal correlation;
-- lightweight NumPy MLP: `(target wind speed, distance) -> throttle`;
+- deeper configurable NumPy MLP: `(target wind speed, distance) -> throttle`;
 - controlled English and Portuguese prompt parsing without cloud services;
 - CSV export and PNG wind-speed plots;
 - Streamlit dashboard, operational bench app, and command-line interface;
@@ -91,7 +91,7 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 
 ## Neural motor-control implementation
 
-- `src/labo_gerador_de_ventos/models/mlp.py`: defining, training, and running the MLP;
+- `src/labo_gerador_de_ventos/models/mlp.py`: defining, training, and running the deeper MLP;
 - `src/labo_gerador_de_ventos/prompt.py`: converting prompts into wind and distance values;
 - `src/labo_gerador_de_ventos/control/neural_command.py`: converting MLP output into a
   safety-limited throttle command;

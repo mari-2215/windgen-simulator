@@ -9,12 +9,13 @@ certified turbulence spectrum.
 
 ## Neural network
 
-The MLP has two inputs (`wind_mps`, `distance_m`), one 12-neuron `tanh` hidden layer, and one
-sigmoid output. Inputs and targets are normalized. Training uses batch gradient descent and mean
-squared error. The output is normalized throttle from 0 to 1.
+The MLP has two inputs (`wind_mps`, `distance_m`), configurable hidden layers, and one sigmoid
+output. The default configuration uses `32 -> 24 -> 12` hidden units, `tanh` activations,
+input/output normalization, deterministic validation, and Adam optimization. The output is
+normalized throttle from 0 to 1.
 
-The synthetic dataset approximates
-`throttle = sqrt(wind/28) * (1 + 0.13*distance) + noise`. This relationship is strictly didactic.
+The synthetic dataset approximates a nonlinear wind/distance/throttle plant with noise. This
+relationship is strictly didactic.
 A physical model must be built using anemometer measurements with the columns
 `wind_mps,distance_m,throttle`, separate training/validation/test sessions, and uncertainty data.
 

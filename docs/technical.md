@@ -9,11 +9,12 @@ de turbulência certificado.
 
 ## Rede neural
 
-A MLP possui 2 entradas (`wind_mps`, `distance_m`), camada oculta `tanh` com 12 neurônios e uma
-saída sigmoide. Entradas e alvo são normalizados. A função de perda é erro quadrático médio e o
-treino usa gradiente descendente em lote. O alvo é throttle normalizado de 0 a 1.
+A MLP possui 2 entradas (`wind_mps`, `distance_m`), múltiplas camadas ocultas configuráveis e uma
+saída sigmoide. A configuração padrão usa camadas `32 -> 24 -> 12`, ativação `tanh`, normalização
+de entradas/saída, validação determinística e otimizador Adam. O alvo é throttle normalizado de
+0 a 1.
 
-O conjunto sintético aproxima `throttle = sqrt(wind/28) * (1 + 0.13*distance) + ruido`. Essa lei
+O conjunto sintético aproxima uma planta não linear de vento/distância/throttle com ruído. Essa lei
 é apenas uma planta didática. O modelo válido deve ser treinado com CSV de anemômetro contendo
 `wind_mps,distance_m,throttle`, com separação treino/validação e registro da incerteza.
 
@@ -33,4 +34,3 @@ O conjunto sintético aproxima `throttle = sqrt(wind/28) * (1 + 0.13*distance) +
 - comando passa por limite de rampa e teto;
 - backend físico não abre porta serial sem token explícito;
 - todos os testes passam em Python 3.12.
-

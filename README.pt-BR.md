@@ -4,7 +4,7 @@
 
 Projeto acadêmico - Fase 1 de um gerador de ventos inteligente para simular séries temporais
 inspiradas em cenários offshore. O sistema interpreta um prompt em português, gera velocidades
-com distribuição de Weibull e usa uma rede neural MLP leve para estimar o comando de um motor.
+com distribuição de Weibull e usa uma rede neural MLP profunda para estimar o comando de um motor.
 
 > **Segurança:** o modo padrão é `mock`, mantendo a hélice removida no primeiro ensaio e prevendo
 > anteparo, botão de emergência, limitação de corrente, fixação mecânica e supervisão presencial. A saída
@@ -14,7 +14,7 @@ com distribuição de Weibull e usa uma rede neural MLP leve para estimar o coma
 ## O que a Fase 1 entrega
 
 - gerador Weibull reproduzível com rajadas e correlação temporal;
-- MLP NumPy treinada como modelo inverso `(vento desejado, distância) -> throttle`;
+- MLP NumPy profunda e configurável como modelo inverso `(vento desejado, distância) -> throttle`;
 - interpretação controlada de prompts, sem depender de serviço externo;
 - CSV e gráfico PNG;
 - dashboard Streamlit com simulação e app de bancada operacional;
@@ -93,7 +93,7 @@ perfil, comando pronto, registro do ensaio e execução física guardada do Benc
 
 O controle foi distribuído em camadas auditáveis:
 
-- `src/labo_gerador_de_ventos/models/mlp.py`: definindo, treinando e executando a MLP;
+- `src/labo_gerador_de_ventos/models/mlp.py`: definindo, treinando e executando a MLP profunda;
 - `src/labo_gerador_de_ventos/prompt.py`: convertendo o prompt em vento e distância;
 - `src/labo_gerador_de_ventos/control/neural_command.py`: transformando a previsão da MLP em
   throttle e aplicando o teto independente do Bench Test 1;
@@ -112,8 +112,9 @@ O caminho implementado ficou definido como:
 prompt -> parser -> MLP -> throttle previsto -> limite de 10% -> rampa -> F405/ESC -> motor
 ```
 
-Por ter sido treinada com dados sintéticos, a MLP permaneceu classificada como demonstração de
-integração. A calibração física ficou reservada à coleta posterior com anemômetro.
+Por ter sido treinada com dados sintéticos, a MLP permaneceu classificada como demonstração neural
+de integração. A arquitetura foi ampliada com múltiplas camadas, Adam e validação, mas a precisão
+física depende da coleta posterior com anemômetro e dados reais da bancada.
 
 Python 3.12 é a versão-alvo do projeto. Em Raspberry Pi OS, a disponibilidade deverá ser confirmada
 para a arquitetura/versão instalada; oferecendo a imagem oficial outra versão, ficou previsto o
