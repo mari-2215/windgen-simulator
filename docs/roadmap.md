@@ -8,7 +8,8 @@
 | Fase 1.3 | Bench Test 3 com rampa de 2 s | Throttle máximo, RPM, comandos neurais e exaustão planejados |
 | Fase 1.4 | Aplicativo de bancada operacional | Execução guardada do Bench Test 3, gráficos, comandos e logs |
 | Fase 1.5 | Bench Test 4 neural e exaustão | Prompt, 10 min, layout 1-4 motores e registro de RPM |
-| Fase 1.6 | Aplicativo com instrumentação | Leitura de RPM, telemetria sem fio e parada evidente |
+| Fase 1.6 | Bench Test 5 com feedback de vento | Anemômetro serial/simulado, correção proporcional e app |
+| Fase 1.7 | Aplicativo com instrumentação | Leitura de RPM, telemetria sem fio e parada evidente |
 | Fase 2 | Anemômetro, LiDAR opcional e dataset real | Modelo calibrado |
 | Fase 3 | Controle feed-forward + PID e watchdog MCU | Malha fechada |
 | Fase 4 | Duto, colmeia de fluxo e instrumentação | Perfil espacial mais uniforme |

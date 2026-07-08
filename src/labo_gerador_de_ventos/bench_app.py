@@ -30,6 +30,9 @@ class BenchAppConfig:
     prompt: str = "vento offshore de 6 m/s por 3 s a 1 m"
     layout: str = "cross"
     motor_count: int = 1
+    wind_source: str = "simulated"
+    wind_port: str = ""
+    feedback_kp: float = 0.035
 
 
 def profile_points(config: BenchAppConfig) -> tuple[ControlPoint, ...]:
@@ -44,6 +47,12 @@ def profile_points(config: BenchAppConfig) -> tuple[ControlPoint, ...]:
             hold_s=config.hold_s,
         )
     if config.bench_test == "Bench Test 4":
+        return build_bench_test_3_profile(
+            max_throttle=config.max_throttle,
+            ramp_s=config.ramp_s,
+            hold_s=config.duration_s,
+        )
+    if config.bench_test == "Bench Test 5":
         return build_bench_test_3_profile(
             max_throttle=config.max_throttle,
             ramp_s=config.ramp_s,
@@ -167,6 +176,44 @@ def command_args(config: BenchAppConfig, *, python_executable: str | None = None
             "--sample-period",
             f"{config.sample_period_s:.2f}",
         ]
+        if config.mode == "motor":
+            args.extend(
+                [
+                    "--port",
+                    config.port,
+                    "--confirm-secured",
+                    "--confirm-supervision",
+                    "--confirm-estop",
+                ]
+            )
+        return args
+    if config.bench_test == "Bench Test 5":
+        args = [
+            python,
+            "scripts/bench_test_5.py",
+            "--mode",
+            "motor" if config.mode == "motor" else "mock",
+            "--prompt",
+            config.prompt,
+            "--layout",
+            config.layout,
+            "--motor-count",
+            str(config.motor_count),
+            "--max-throttle",
+            f"{config.max_throttle:.2f}",
+            "--duration",
+            f"{config.duration_s:.1f}",
+            "--ramp",
+            f"{config.ramp_s:.1f}",
+            "--sample-period",
+            f"{config.sample_period_s:.2f}",
+            "--kp",
+            f"{config.feedback_kp:.4f}",
+            "--wind-source",
+            config.wind_source,
+        ]
+        if config.wind_source == "serial":
+            args.extend(["--wind-port", config.wind_port])
         if config.mode == "motor":
             args.extend(
                 [

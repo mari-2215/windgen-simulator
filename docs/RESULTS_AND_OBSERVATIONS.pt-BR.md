@@ -25,6 +25,17 @@ O Bench Test 4 foi estruturado como ensaio de exaustão e comando neural por pro
 foi definida em torno de 10 minutos, com preparação para layout de 1 a 4 motores em cruz ou em X e
 registro de RPM.
 
+O ensaio de maior duração funcionou melhor pelo terminal, com visualização clara do throttle alvo.
+Também ficou registrado que o motor ainda não obedeceu ao throttle de modo confiável, portanto o
+controle neural ainda não foi considerado fechado. A execução pelo app precisou evoluir para não
+depender de porcentagem manual.
+
+## Bench Test 5
+
+O Bench Test 5 foi definido para implementar comando neural no terminal e no app, junto com
+feedback de velocidade atual do vento. A leitura real de vento foi separada da leitura de RPM:
+vento exige anemômetro ou sensor externo; RPM continua como telemetria/instrumentação do motor.
+
 ## Melhorias incorporadas
 
 - A rampa de parada foi adicionada ao fluxo normal do `scripts/bench_test_1.py`.
@@ -34,6 +45,7 @@ registro de RPM.
 - O Bench Test 3 foi estruturado como próxima etapa, com rampa de 2 s para subida e descida.
 - O aplicativo de bancada foi atualizado para execução física guardada do Bench Test 3.
 - O Bench Test 4 foi adicionado com comando por prompt neural, duração longa e layout multimotor.
+- O Bench Test 5 foi adicionado com feedback de vento atual e fonte de sensor `simulated`/`serial`.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.

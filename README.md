@@ -72,8 +72,9 @@ execution time. After the test, the normal shutdown path was updated to include 
 down to 0%, while immediate stop remains reserved for interruptions and failures.
 
 Bench Test 2 was also completed successfully, validating the gradient profile. Bench Test 3 was
-completed successfully, with 61 samples showing the best shutdown-ramp behavior. Bench Test 4 now
-targets endurance testing, prompt-based neural commands, 1-4 motor layouts, and RPM records.
+completed successfully, with 61 samples showing the best shutdown-ramp behavior. Bench Test 4
+exposed the need for closed-loop behavior, and Bench Test 5 now adds current wind-speed feedback
+through a simulated source or an external serial anemometer.
 
 The bench application is now part of `app.py`, centralizing planning, profile visualization,
 command previews, test records, and guarded physical execution for Bench Test 3.
@@ -82,6 +83,7 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - [Bench Test 2 - Portuguese](docs/BENCH_TEST_2.pt-BR.md)
 - [Bench Test 3 - Portuguese](docs/BENCH_TEST_3.pt-BR.md)
 - [Bench Test 4 - Portuguese](docs/BENCH_TEST_4.pt-BR.md)
+- [Bench Test 5 - Portuguese](docs/BENCH_TEST_5.pt-BR.md)
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
 - [Bench Test 2 video](docs/media/bench-test-2-gradient-run.mp4)
 
@@ -98,7 +100,9 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - `scripts/bench_test_2.py`: preparing the gradient profile `0% -> 10% -> 60% -> 25% -> 0%`.
 - `scripts/bench_test_3.py`: planning 2 s ramp up, maximum-throttle hold, and 2 s ramp down.
 - `scripts/bench_test_4.py`: running prompt-based neural endurance tests for 1-4 motor layouts.
+- `scripts/bench_test_5.py`: running neural commands with current wind-speed feedback.
 - `src/labo_gerador_de_ventos/control/neural_array.py`: distributing neural throttle by position.
+- `src/labo_gerador_de_ventos/sensors/wind.py`: reading simulated wind or a serial anemometer.
 
 ```text
 prompt -> parser -> MLP -> predicted throttle -> 10% ceiling -> ramp -> F405/ESC -> motor

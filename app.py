@@ -24,8 +24,8 @@ st.set_page_config(page_title="Neural Offshore Wind Lab", page_icon="🌬️", l
 st.title("Neural Offshore Wind Lab")
 st.caption("Phase 1 / Fase 1 - Weibull + MLP | simulation and operational bench mode")
 st.warning(
-    "Physical motor execution is available only in guarded Bench Test 3 motor mode. Confirm the "
-    "laboratory setup before running any motor command."
+    "Physical motor execution is guarded by laboratory confirmations. Real wind-speed feedback "
+    "requires an external anemometer or another measured wind sensor."
 )
 
 
@@ -71,20 +71,21 @@ def render_bench_tab() -> None:
     st.subheader("Bench Tests")
     st.caption(
         "Aplicativo de bancada operacional: planejamento, perfil de throttle, comando pronto, "
-        "execução guardada do Bench Test 3 e registro."
+        "execução guardada, feedback de vento e registro."
     )
 
     col_left, col_right = st.columns([1, 1])
     with col_left:
         bench_test = st.selectbox(
             "Teste",
-            ["Bench Test 1", "Bench Test 2", "Bench Test 3", "Bench Test 4"],
+            ["Bench Test 1", "Bench Test 2", "Bench Test 3", "Bench Test 4", "Bench Test 5"],
         )
         mode_options = {
             "Bench Test 1": ["mock", "neural-mock", "serial-check", "physical-preview"],
             "Bench Test 2": ["mock", "physical-preview"],
             "Bench Test 3": ["mock", "motor"],
             "Bench Test 4": ["mock", "motor"],
+            "Bench Test 5": ["mock", "motor"],
         }
         mode = st.selectbox("Modo", mode_options[bench_test])
         port = st.text_input("Porta serial", "/dev/ttyACM0")
@@ -96,10 +97,22 @@ def render_bench_tab() -> None:
         max_default = 0.08 if bench_test == "Bench Test 1" else 0.60
         max_throttle = st.slider("Throttle máximo", 0.01, 1.0, max_default, 0.01)
         duration_s = st.number_input("Duração do Bench Test 1 (s)", 1.0, 10.0, 3.0, 0.5)
-        endurance_s = st.number_input("Duração do Bench Test 4 (s)", 10.0, 900.0, 600.0, 10.0)
+        endurance_s = st.number_input("Duração do Bench Test 4/5 (s)", 10.0, 900.0, 600.0, 10.0)
         ramp_s = st.number_input("Rampa do Bench Test 3 (s)", 0.5, 10.0, 2.0, 0.5)
         hold_s = st.number_input("Patamar do Bench Test 3 (s)", 0.5, 30.0, 3.0, 0.5)
         sample_period_s = st.number_input("Amostragem do perfil (s)", 0.05, 2.0, 0.25, 0.05)
+        feedback_kp = st.number_input("Ganho do feedback de vento (kp)", 0.0, 0.2, 0.035, 0.005)
+
+    if bench_test == "Bench Test 5":
+        wind_source = st.selectbox("Fonte da velocidade atual do vento", ["simulated", "serial"])
+        wind_port = st.text_input("Porta do anemômetro serial", "")
+        if wind_source == "serial":
+            st.info("Feedback real de vento habilitado: o anemômetro deve enviar velocidade em m/s por linha serial.")
+        else:
+            st.warning("Sem sensor externo, a velocidade atual do vento fica simulada. Para feedback real, é necessário anemômetro.")
+    else:
+        wind_source = "simulated"
+        wind_port = ""
 
     prompt = st.text_area(
         "Prompt neural",
@@ -112,13 +125,16 @@ def render_bench_tab() -> None:
         port=port,
         motor=int(motor),
         max_throttle=float(max_throttle),
-        duration_s=float(endurance_s if bench_test == "Bench Test 4" else duration_s),
+        duration_s=float(endurance_s if bench_test in ("Bench Test 4", "Bench Test 5") else duration_s),
         ramp_s=float(ramp_s),
         hold_s=float(hold_s),
         sample_period_s=float(sample_period_s),
         prompt=prompt,
         layout=layout,
         motor_count=int(motor_count),
+        wind_source=wind_source,
+        wind_port=wind_port,
+        feedback_kp=float(feedback_kp),
     )
 
     frame = profile_frame(config)
@@ -133,7 +149,7 @@ def render_bench_tab() -> None:
     if mode in ("physical-preview", "motor"):
         st.error(
             "Modo físico. A bancada deve estar fixa, supervisionada e com corte de energia pronto. "
-            "Bench Test 3 pode executar o motor diretamente por esta tela."
+            "Bench Tests 3, 4 e 5 podem executar o motor diretamente por esta tela."
         )
     else:
         st.success("Modo seguro: o comando gerado não aciona hardware físico.")
@@ -141,7 +157,7 @@ def render_bench_tab() -> None:
     command = command_preview(config)
     st.code(command, language="bash")
 
-    if bench_test in ("Bench Test 3", "Bench Test 4") and mode == "motor":
+    if bench_test in ("Bench Test 3", "Bench Test 4", "Bench Test 5") and mode == "motor":
         st.subheader("Execução física")
         secured = st.checkbox("Motor/arranjo preso, protegido e sem possibilidade de soltar a fixação")
         supervised = st.checkbox("Supervisão de laboratório ativa")
@@ -152,15 +168,24 @@ def render_bench_tab() -> None:
                 "Confirmação para throttle acima de 60%",
                 placeholder="FULL_THROTTLE_APPROVED",
             )
-        ready = secured and supervised and estop and (max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED")
+        sensor_ready = not (bench_test == "Bench Test 5" and wind_source == "serial" and not wind_port.strip())
+        ready = (
+            secured
+            and supervised
+            and estop
+            and sensor_ready
+            and (max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED")
+        )
         if not ready:
             st.info("A execução física será liberada após as confirmações de bancada.")
+            if not sensor_ready:
+                st.warning("Anemômetro serial selecionado sem porta definida.")
         if st.button(f"Executar {bench_test} no motor", type="primary", disabled=not ready):
             root = project_root()
             env = os.environ.copy()
             src_path = str(root / "src")
             env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "")
-            with st.spinner("Executando Bench Test 3 no motor..."):
+            with st.spinner(f"Executando {bench_test} no motor..."):
                 result = subprocess.run(
                     command_args(config, python_executable=sys.executable),
                     cwd=root,

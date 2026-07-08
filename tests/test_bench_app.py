@@ -77,3 +77,26 @@ def test_bench_app_generates_bench_test_4_neural_motor_command() -> None:
     assert "x" in args
     assert "--motor-count" in args
     assert "4" in args
+
+
+def test_bench_app_generates_bench_test_5_feedback_command() -> None:
+    config = BenchAppConfig(
+        bench_test="Bench Test 5",
+        mode="motor",
+        prompt="vento offshore de 12 m/s por 60 s a 1 m",
+        layout="cross",
+        motor_count=1,
+        duration_s=60.0,
+        max_throttle=1.0,
+        wind_source="serial",
+        wind_port="/dev/ttyUSB0",
+        feedback_kp=0.04,
+    )
+    args = command_args(config, python_executable="python3")
+    assert "scripts/bench_test_5.py" in args
+    assert "--wind-source" in args
+    assert "serial" in args
+    assert "--wind-port" in args
+    assert "/dev/ttyUSB0" in args
+    assert "--kp" in args
+    assert "0.0400" in args
