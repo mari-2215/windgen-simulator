@@ -24,8 +24,8 @@ st.set_page_config(page_title="Neural Offshore Wind Lab", page_icon="🌬️", l
 st.title("Neural Offshore Wind Lab")
 st.caption("Phase 1 / Fase 1 - Weibull + MLP | simulation and operational bench mode")
 st.warning(
-    "Physical motor execution is guarded by laboratory confirmations. Real wind-speed feedback "
-    "requires an external anemometer or another measured wind sensor."
+    "Physical motor execution is guarded by laboratory confirmations. Bench Test 5 uses the prompt "
+    "and neural model as the command source; wind measurement remains external to the stack."
 )
 
 
@@ -94,8 +94,12 @@ def render_bench_tab() -> None:
         layout = st.selectbox("Layout do arranjo", ["cross", "x"])
 
     with col_right:
-        max_default = 0.08 if bench_test == "Bench Test 1" else 0.60
-        max_throttle = st.slider("Throttle máximo", 0.01, 1.0, max_default, 0.01)
+        if bench_test == "Bench Test 5":
+            max_throttle = 1.0
+            st.info("Bench Test 5: o throttle é calculado pela rede neural a partir do prompt.")
+        else:
+            max_default = 0.08 if bench_test == "Bench Test 1" else 0.60
+            max_throttle = st.slider("Throttle máximo", 0.01, 1.0, max_default, 0.01)
         duration_s = st.number_input("Duração do Bench Test 1 (s)", 1.0, 10.0, 3.0, 0.5)
         endurance_s = st.number_input("Duração do Bench Test 4/5 (s)", 10.0, 900.0, 600.0, 10.0)
         ramp_s = st.number_input("Rampa do Bench Test 3 (s)", 0.5, 10.0, 2.0, 0.5)
@@ -104,12 +108,12 @@ def render_bench_tab() -> None:
         feedback_kp = st.number_input("Ganho do feedback de vento (kp)", 0.0, 0.2, 0.035, 0.005)
 
     if bench_test == "Bench Test 5":
-        wind_source = st.selectbox("Fonte da velocidade atual do vento", ["simulated", "serial"])
-        wind_port = st.text_input("Porta do anemômetro serial", "")
-        if wind_source == "serial":
-            st.info("Feedback real de vento habilitado: o anemômetro deve enviar velocidade em m/s por linha serial.")
-        else:
-            st.warning("Sem sensor externo, a velocidade atual do vento fica simulada. Para feedback real, é necessário anemômetro.")
+        wind_source = "simulated"
+        wind_port = ""
+        st.warning(
+            "Anemômetro real será externo e não foi incluído no app nesta etapa. "
+            "O terminal ainda aceita fonte serial quando o sensor existir."
+        )
     else:
         wind_source = "simulated"
         wind_port = ""
@@ -168,18 +172,11 @@ def render_bench_tab() -> None:
                 "Confirmação para throttle acima de 60%",
                 placeholder="FULL_THROTTLE_APPROVED",
             )
-        sensor_ready = not (bench_test == "Bench Test 5" and wind_source == "serial" and not wind_port.strip())
-        ready = (
-            secured
-            and supervised
-            and estop
-            and sensor_ready
-            and (max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED")
+        ready = secured and supervised and estop and (
+            max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED"
         )
         if not ready:
             st.info("A execução física será liberada após as confirmações de bancada.")
-            if not sensor_ready:
-                st.warning("Anemômetro serial selecionado sem porta definida.")
         if st.button(f"Executar {bench_test} no motor", type="primary", disabled=not ready):
             root = project_root()
             env = os.environ.copy()

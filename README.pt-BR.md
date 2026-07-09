@@ -84,6 +84,7 @@ perfil, comando pronto, registro do ensaio e execução física guardada do Benc
 - [Bench Test 3](docs/BENCH_TEST_3.pt-BR.md)
 - [Bench Test 4](docs/BENCH_TEST_4.pt-BR.md)
 - [Bench Test 5](docs/BENCH_TEST_5.pt-BR.md)
+- [Notas de RPM pela SpeedyBee](docs/RPM_SPEEDYBEE.pt-BR.md)
 - [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](docs/media/bench-test-2-gradient-run.mp4)
 

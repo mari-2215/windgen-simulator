@@ -84,6 +84,7 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - [Bench Test 3 - Portuguese](docs/BENCH_TEST_3.pt-BR.md)
 - [Bench Test 4 - Portuguese](docs/BENCH_TEST_4.pt-BR.md)
 - [Bench Test 5 - Portuguese](docs/BENCH_TEST_5.pt-BR.md)
+- [SpeedyBee RPM notes - Portuguese](docs/RPM_SPEEDYBEE.pt-BR.md)
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
 - [Bench Test 2 video](docs/media/bench-test-2-gradient-run.mp4)
 

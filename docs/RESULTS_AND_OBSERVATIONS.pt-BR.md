@@ -36,6 +36,15 @@ O Bench Test 5 foi definido para implementar comando neural no terminal e no app
 feedback de velocidade atual do vento. A leitura real de vento foi separada da leitura de RPM:
 vento exige anemômetro ou sensor externo; RPM continua como telemetria/instrumentação do motor.
 
+Após avaliação do app, ficou registrado que o Bench Test 5 não deve pedir porcentagem manual de
+throttle como parâmetro principal. O comando deve partir do prompt, com a rede neural calculando o
+throttle necessário. O app foi simplificado nessa direção.
+
+A leitura de RPM pela stack SpeedyBee foi considerada possível, mas ainda não confiável com o motor
+inrunner usado nesta fase. Ao habilitar Bidirectional DShot, o motor apresentou movimento aos
+“trotes”, sem rotação contínua estável. A leitura de anemômetro foi mantida como instrumento externo
+de bancada, sem necessidade de inclusão no app nesta etapa.
+
 ## Melhorias incorporadas
 
 - A rampa de parada foi adicionada ao fluxo normal do `scripts/bench_test_1.py`.
@@ -46,6 +55,8 @@ vento exige anemômetro ou sensor externo; RPM continua como telemetria/instrume
 - O aplicativo de bancada foi atualizado para execução física guardada do Bench Test 3.
 - O Bench Test 4 foi adicionado com comando por prompt neural, duração longa e layout multimotor.
 - O Bench Test 5 foi adicionado com feedback de vento atual e fonte de sensor `simulated`/`serial`.
+- O app do Bench Test 5 foi ajustado para comando por prompt neural, sem controle manual principal
+  de throttle.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.

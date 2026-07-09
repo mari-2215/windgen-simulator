@@ -13,10 +13,14 @@ Para medir velocidade atual de vento de verdade, é necessário um sensor extern
 anemômetro serial, sensor diferencial calibrado ou outro medidor validado. A stack/controladora e o
 ESC podem ajudar com telemetria de motor/RPM, mas RPM não é medição direta de vento.
 
-O projeto implementa duas fontes:
+O terminal mantém duas fontes para desenvolvimento:
 
 - `simulated`: feedback simulado, usado para teste de software sem sensor;
 - `serial`: anemômetro externo enviando uma velocidade em `m/s` por linha serial.
+
+No aplicativo, o Bench Test 5 foi simplificado: o comando principal é o prompt neural, e o
+anemômetro real fica como instrumentação externa de bancada, não como requisito visual do app nesta
+etapa.
 
 ## Execução simulada
 
@@ -60,9 +64,20 @@ O valor final continua limitado por `--max-throttle`.
 
 ## RPM
 
-A leitura de RPM permanece uma instrumentação separada. RPM pode ser útil para diagnosticar ESC,
-motor e carga, mas não substitui anemômetro para feedback de vento. O caminho previsto ficou:
+A leitura de RPM permanece uma instrumentação separada. Foi identificado que a stack SpeedyBee pode
+fornecer caminho para RPM via telemetria/recursos do ecossistema Betaflight/ESC, mas o motor
+inrunner usado nesta etapa não forneceu leitura confiável. Além disso, ao habilitar Bidirectional
+DShot, o motor passou a apresentar movimento aos “trotes”, em vez de rotação contínua.
+
+RPM pode ser útil para diagnosticar ESC, motor e carga, mas não substitui anemômetro para feedback
+de vento. O caminho previsto ficou:
 
 1. estabelecer feedback de vento com anemômetro;
 2. adicionar RPM por telemetria ESC, sensor óptico ou Hall;
 3. registrar vento, throttle, RPM e observações no mesmo log.
+
+## Observação do app
+
+No Bench Test 5 não foi mantido o conceito de “throttle máximo permitido” como comando principal.
+O app passou a tratar o prompt como entrada de comando, deixando a rede neural calcular o throttle
+necessário. O teto interno segue existindo apenas como proteção operacional do script.
