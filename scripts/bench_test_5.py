@@ -41,6 +41,11 @@ def build_sensor(args: argparse.Namespace):
 
 def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> None:
     request = parse_prompt(args.prompt)
+    if request.mean_mps > args.motor_wind_limit:
+        raise SystemExit(
+            f"Target wind {request.mean_mps:.2f} m/s exceeds motor bench limit "
+            f"{args.motor_wind_limit:.2f} m/s."
+        )
     model = build_default_model(seed=args.seed, epochs=args.epochs)
     base_commands = infer_motor_throttles(
         args.prompt,
@@ -137,8 +142,9 @@ def main() -> None:
     parser.add_argument("--max-throttle", type=float, default=1.0)
     parser.add_argument("--duration", type=float, default=60.0)
     parser.add_argument("--ramp", type=float, default=2.0)
-    parser.add_argument("--sample-period", type=float, default=1.0)
+    parser.add_argument("--sample-period", type=float, default=0.05)
     parser.add_argument("--kp", type=float, default=0.035)
+    parser.add_argument("--motor-wind-limit", type=float, default=19.0)
     parser.add_argument("--wind-source", choices=("simulated", "serial"), default="simulated")
     parser.add_argument("--wind-port")
     parser.add_argument("--wind-baudrate", type=int, default=9600)

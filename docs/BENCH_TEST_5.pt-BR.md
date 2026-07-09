@@ -62,12 +62,31 @@ throttle_corrigido = throttle_base + kp * (vento_alvo - vento_medido)
 
 O valor final continua limitado por `--max-throttle`.
 
+## Resultado parcial com motor outrunner
+
+Após testes com motor outrunner, a resposta aos comandos de throttle melhorou em relação ao motor
+inrunner usado anteriormente. O motor registrado para esta etapa foi o **HYPERION ZS3025B-10**.
+A velocidade máxima suportada na bancada para esse conjunto foi registrada como **19 m/s**.
+
+A taxa de amostragem de `0.05 s` apresentou melhor comportamento no aplicativo, reduzindo os
+engasgos percebidos durante a rampa. Esse valor passou a ser adotado como padrão operacional nos
+perfis novos do app e do Bench Test 5.
+
+Mídias registradas:
+
+- [resposta de throttle com motor outrunner](media/bench-test-5-outrunner-throttle-response.mp4);
+- [execução pelo app com amostragem 0.05 s](media/bench-test-5-app-sampling-005.mp4).
+
 ## RPM
 
 A leitura de RPM permanece uma instrumentação separada. Foi identificado que a stack SpeedyBee pode
 fornecer caminho para RPM via telemetria/recursos do ecossistema Betaflight/ESC, mas o motor
 inrunner usado nesta etapa não forneceu leitura confiável. Além disso, ao habilitar Bidirectional
 DShot, o motor passou a apresentar movimento aos “trotes”, em vez de rotação contínua.
+
+Mesmo com o motor outrunner, a leitura de RPM pelo SpeedyBee ainda não foi obtida de forma confiável
+durante esta atualização. A integração por API Betaflight envolvendo posição/tempo foi registrada
+como tentativa não concluída e ficou fora do caminho crítico do Bench Test 5.
 
 RPM pode ser útil para diagnosticar ESC, motor e carga, mas não substitui anemômetro para feedback
 de vento. O caminho previsto ficou:

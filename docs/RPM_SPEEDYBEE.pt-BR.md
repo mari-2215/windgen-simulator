@@ -11,6 +11,8 @@ bancada atual.
 - Ao habilitar Bidirectional DShot, o motor passou a se movimentar em “trotes”, sem rotação
   contínua estável.
 - Por esse motivo, RPM não foi adotado como variável de controle no Bench Test 5.
+- Mesmo após a troca para motor outrunner, a leitura de RPM pelo SpeedyBee ainda não foi obtida de
+  forma confiável nesta fase.
 
 ## Decisão de engenharia
 

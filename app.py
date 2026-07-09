@@ -104,7 +104,7 @@ def render_bench_tab() -> None:
         endurance_s = st.number_input("Duração do Bench Test 4/5 (s)", 10.0, 900.0, 600.0, 10.0)
         ramp_s = st.number_input("Rampa do Bench Test 3 (s)", 0.5, 10.0, 2.0, 0.5)
         hold_s = st.number_input("Patamar do Bench Test 3 (s)", 0.5, 30.0, 3.0, 0.5)
-        sample_period_s = st.number_input("Amostragem do perfil (s)", 0.05, 2.0, 0.25, 0.05)
+        sample_period_s = st.number_input("Amostragem do perfil (s)", 0.05, 2.0, 0.05, 0.05)
         feedback_kp = st.number_input("Ganho do feedback de vento (kp)", 0.0, 0.2, 0.035, 0.005)
 
     if bench_test == "Bench Test 5":
@@ -161,19 +161,50 @@ def render_bench_tab() -> None:
     command = command_preview(config)
     st.code(command, language="bash")
 
+    st.subheader("Parada")
+    stop_confirmed = st.checkbox("STOP liberado para a porta serial informada")
+    if st.button("Enviar STOP agora", type="secondary", disabled=not stop_confirmed):
+        root = project_root()
+        env = os.environ.copy()
+        src_path = str(root / "src")
+        env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "")
+        stop_result = subprocess.run(
+            [
+                sys.executable,
+                "scripts/emergency_stop.py",
+                "--port",
+                port,
+                "--confirm-stop",
+            ],
+            cwd=root,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=5.0,
+            check=False,
+        )
+        if stop_result.returncode == 0:
+            st.success("STOP enviado.")
+        else:
+            st.error(f"STOP falhou com código {stop_result.returncode}.")
+        if stop_result.stdout:
+            st.text_area("Saída do STOP", stop_result.stdout, height=100)
+        if stop_result.stderr:
+            st.text_area("Erro do STOP", stop_result.stderr, height=100)
+
     if bench_test in ("Bench Test 3", "Bench Test 4", "Bench Test 5") and mode == "motor":
         st.subheader("Execução física")
         secured = st.checkbox("Motor/arranjo preso, protegido e sem possibilidade de soltar a fixação")
         supervised = st.checkbox("Supervisão de laboratório ativa")
         estop = st.checkbox("Corte físico de energia pronto")
         full_text = ""
-        if max_throttle > 0.60:
+        if max_throttle > 0.60 and bench_test != "Bench Test 5":
             full_text = st.text_input(
                 "Confirmação para throttle acima de 60%",
                 placeholder="FULL_THROTTLE_APPROVED",
             )
         ready = secured and supervised and estop and (
-            max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED"
+            bench_test == "Bench Test 5" or max_throttle <= 0.60 or full_text == "FULL_THROTTLE_APPROVED"
         )
         if not ready:
             st.info("A execução física será liberada após as confirmações de bancada.")

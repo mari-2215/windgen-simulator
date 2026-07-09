@@ -37,6 +37,13 @@ def parse_prompt(text: str) -> WindRequest:
     )
     if match:
         duration = float(match.group(1)) * (60.0 if match.group(2).startswith("min") else 1.0)
+    else:
+        match = re.search(
+            r"(?<!/)\b(\d+(?:\.\d+)?)\s*(segundos?|secs?|sec|seconds?|s|min|minutes?|minutos?)\b",
+            clean,
+        )
+        if match:
+            duration = float(match.group(1)) * (60.0 if match.group(2).startswith("min") else 1.0)
     distance = 1.5
     match = re.search(
         r"(?:\ba\s+|\bat\s+|\bdistancia\s*(?:de)?\s*|\bdistance\s*(?:of)?\s*)"

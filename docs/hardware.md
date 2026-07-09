@@ -5,6 +5,8 @@
 - Raspberry Pi 2B: prompt, simulação, inferência, logs e supervisão.
 - SpeedyBee F405 V4: temporização de motor/ESC sob firmware Betaflight compatível.
 - ESC do stack + motor outrunner: estágio de potência.
+- Motor registrado em Bench Test 5: HYPERION ZS3025B-10, com velocidade máxima de bancada limitada
+  a 19 m/s nesta fase experimental.
 - Fonte de bancada dimensionada: corrente limitada e aterramento conforme projeto elétrico.
 - Anemômetro: obrigatório para calibração física da MLP.
 

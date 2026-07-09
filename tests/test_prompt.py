@@ -22,3 +22,9 @@ def test_english_prompt() -> None:
     assert request.gust_mps == pytest.approx(18)
     assert request.duration_s == 120
     assert request.distance_m == pytest.approx(1.5)
+
+
+@pytest.mark.parametrize("duration_text", ["15s", "15 s", "15 segundos"])
+def test_prompt_accepts_compact_duration_typos(duration_text: str) -> None:
+    request = parse_prompt(f"vento offshore de 12 m/s {duration_text} a 1 m")
+    assert request.duration_s == 15

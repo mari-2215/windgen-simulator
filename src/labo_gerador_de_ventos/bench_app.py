@@ -26,7 +26,7 @@ class BenchAppConfig:
     duration_s: float = 3.0
     ramp_s: float = 2.0
     hold_s: float = 3.0
-    sample_period_s: float = 0.25
+    sample_period_s: float = 0.05
     prompt: str = "vento offshore de 6 m/s por 3 s a 1 m"
     layout: str = "cross"
     motor_count: int = 1

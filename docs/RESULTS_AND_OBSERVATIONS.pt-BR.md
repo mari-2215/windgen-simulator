@@ -45,6 +45,11 @@ inrunner usado nesta fase. Ao habilitar Bidirectional DShot, o motor apresentou 
 “trotes”, sem rotação contínua estável. A leitura de anemômetro foi mantida como instrumento externo
 de bancada, sem necessidade de inclusão no app nesta etapa.
 
+Em seguida, foram realizados testes com motor outrunner. A resposta ao throttle melhorou bastante,
+embora a leitura de RPM pelo SpeedyBee ainda não tenha sido obtida. O motor registrado foi
+**HYPERION ZS3025B-10**, com velocidade máxima de bancada definida em **19 m/s**. A amostragem de
+`0.05 s` no app apresentou melhor resposta e reduziu engasgos durante a rampa.
+
 ## Melhorias incorporadas
 
 - A rampa de parada foi adicionada ao fluxo normal do `scripts/bench_test_1.py`.
@@ -57,6 +62,9 @@ de bancada, sem necessidade de inclusão no app nesta etapa.
 - O Bench Test 5 foi adicionado com feedback de vento atual e fonte de sensor `simulated`/`serial`.
 - O app do Bench Test 5 foi ajustado para comando por prompt neural, sem controle manual principal
   de throttle.
+- O parser de prompt passou a aceitar durações compactas como `15s` e `15 s`.
+- Um comando de STOP foi adicionado ao terminal e ao aplicativo.
+- As mídias do Bench Test 5 com motor outrunner foram adicionadas ao repositório.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.
@@ -65,6 +73,8 @@ de bancada, sem necessidade de inclusão no app nesta etapa.
 
 - [Vídeo do Bench Test 1](media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](media/bench-test-2-gradient-run.mp4)
+- [Vídeo do Bench Test 5 - resposta com outrunner](media/bench-test-5-outrunner-throttle-response.mp4)
+- [Vídeo do Bench Test 5 - app com amostragem 0.05 s](media/bench-test-5-app-sampling-005.mp4)
 - [Dashboard - entrada do cenário](media/dashboard-input.png)
 - [Dashboard - gráfico de velocidade](media/dashboard-plot.png)
 - [Dashboard - tabela exportável](media/dashboard-table.png)
