@@ -48,7 +48,8 @@ de bancada, sem necessidade de inclusão no app nesta etapa.
 Em seguida, foram realizados testes com motor outrunner. A resposta ao throttle melhorou bastante,
 embora a leitura de RPM pelo SpeedyBee ainda não tenha sido obtida. O motor registrado foi
 **HYPERION ZS3025B-10**, com velocidade máxima de bancada definida em **19 m/s**. A amostragem de
-`0.05 s` no app apresentou melhor resposta e reduziu engasgos durante a rampa.
+`0.1 s` pelo terminal apresentou melhor resposta e reduziu engasgos durante a rampa. O vídeo
+registrado nessa etapa não correspondeu a execução pelo app.
 
 ## Melhorias incorporadas
 
@@ -74,7 +75,7 @@ embora a leitura de RPM pelo SpeedyBee ainda não tenha sido obtida. O motor reg
 - [Vídeo do Bench Test 1](media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](media/bench-test-2-gradient-run.mp4)
 - [Vídeo do Bench Test 5 - resposta com outrunner](media/bench-test-5-outrunner-throttle-response.mp4)
-- [Vídeo do Bench Test 5 - app com amostragem 0.05 s](media/bench-test-5-app-sampling-005.mp4)
+- [Vídeo do Bench Test 5 - terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4)
 - [Dashboard - entrada do cenário](media/dashboard-input.png)
 - [Dashboard - gráfico de velocidade](media/dashboard-plot.png)
 - [Dashboard - tabela exportável](media/dashboard-table.png)

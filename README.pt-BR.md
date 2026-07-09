@@ -88,7 +88,7 @@ perfil, comando pronto, registro do ensaio e execução física guardada do Benc
 - [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](docs/media/bench-test-2-gradient-run.mp4)
 - [Vídeo do Bench Test 5 - outrunner](docs/media/bench-test-5-outrunner-throttle-response.mp4)
-- [Vídeo do Bench Test 5 - app 0.05 s](docs/media/bench-test-5-app-sampling-005.mp4)
+- [Vídeo do Bench Test 5 - terminal 0.1 s](docs/media/bench-test-5-terminal-sampling-010.mp4)
 
 ![Dashboard do simulador](docs/media/dashboard-plot.png)
 

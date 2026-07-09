@@ -68,14 +68,14 @@ Após testes com motor outrunner, a resposta aos comandos de throttle melhorou e
 inrunner usado anteriormente. O motor registrado para esta etapa foi o **HYPERION ZS3025B-10**.
 A velocidade máxima suportada na bancada para esse conjunto foi registrada como **19 m/s**.
 
-A taxa de amostragem de `0.05 s` apresentou melhor comportamento no aplicativo, reduzindo os
-engasgos percebidos durante a rampa. Esse valor passou a ser adotado como padrão operacional nos
-perfis novos do app e do Bench Test 5.
+A taxa de amostragem de `0.1 s` apresentou melhor comportamento na execução pelo terminal,
+reduzindo os engasgos percebidos durante a rampa. O app permaneceu em revisão separada porque o
+vídeo registrado não correspondeu a uma execução feita pela interface.
 
 Mídias registradas:
 
 - [resposta de throttle com motor outrunner](media/bench-test-5-outrunner-throttle-response.mp4);
-- [execução pelo app com amostragem 0.05 s](media/bench-test-5-app-sampling-005.mp4).
+- [execução pelo terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4).
 
 ## RPM
 

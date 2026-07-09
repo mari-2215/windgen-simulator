@@ -88,7 +88,7 @@ command previews, test records, and guarded physical execution for Bench Test 3.
 - [Bench Test 1 video](docs/media/bench-test-1-motor-run.mp4)
 - [Bench Test 2 video](docs/media/bench-test-2-gradient-run.mp4)
 - [Bench Test 5 outrunner video](docs/media/bench-test-5-outrunner-throttle-response.mp4)
-- [Bench Test 5 app 0.05 s video](docs/media/bench-test-5-app-sampling-005.mp4)
+- [Bench Test 5 terminal 0.1 s video](docs/media/bench-test-5-terminal-sampling-010.mp4)
 
 ![Simulator dashboard](docs/media/dashboard-plot.png)
 
