@@ -12,6 +12,7 @@ from labo_gerador_de_ventos.control import (
     MockMultiMotorActuator,
     clear_stop_request,
     infer_motor_throttles,
+    ramp_down_multimotor,
     stop_requested,
 )
 from labo_gerador_de_ventos.models.mlp import build_default_model
@@ -46,13 +47,21 @@ def run_profile(actuator: object, targets: dict[int, float], args: argparse.Name
     total_s = args.ramp + args.duration + args.ramp
     start = time.monotonic()
     step = 0
+    last_values = {motor: 0.0 for motor in targets}
     while True:
         elapsed = time.monotonic() - start if real_time else step * args.sample_period
         if elapsed > total_s:
             break
         if real_time and stop_requested():
-            print("STOP REQUEST DETECTED. Leaving Bench Test 4 loop.")
-            break
+            print(f"STOP REQUEST DETECTED. Applying Bench Test 4 stop ramp for {args.ramp:.2f}s.")
+            ramp_down_multimotor(
+                actuator,
+                last_values,
+                duration_s=args.ramp,
+                sample_period_s=args.sample_period,
+                real_time=True,
+            )
+            return
         if elapsed < args.ramp:
             factor = elapsed / args.ramp
         elif elapsed < args.ramp + args.duration:
@@ -60,6 +69,7 @@ def run_profile(actuator: object, targets: dict[int, float], args: argparse.Name
         else:
             factor = max(0.0, 1.0 - (elapsed - args.ramp - args.duration) / args.ramp)
         values = scaled_targets(targets, factor)
+        last_values = values
         actuator.set_throttles(values)
         values_text = " ".join(f"M{motor}={value:5.1%}" for motor, value in sorted(values.items()))
         print(f"t={elapsed:7.2f}s {values_text}")

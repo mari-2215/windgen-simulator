@@ -17,6 +17,7 @@ from .profiles import (
     build_bench_test_3_profile,
     interpolate_profile,
 )
+from .ramp import ramp_down_multimotor
 from .stop_signal import clear_stop_request, request_stop, stop_requested, stop_request_path
 
 __all__ = [
@@ -38,6 +39,7 @@ __all__ = [
     "ControlPoint",
     "build_bench_test_3_profile",
     "interpolate_profile",
+    "ramp_down_multimotor",
     "clear_stop_request",
     "request_stop",
     "stop_requested",

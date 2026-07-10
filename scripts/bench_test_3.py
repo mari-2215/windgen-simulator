@@ -128,6 +128,7 @@ def run_motor(args: argparse.Namespace) -> None:
             sample_period_s=args.sample_period,
             real_time=True,
         )
+        print(f"Applying stop ramp for {args.ramp:.2f}s.")
         controller.ramp_to(0.0, step_interval_s=args.sample_period, timeout_s=max(args.ramp + 2.0, 4.0))
     except KeyboardInterrupt:
         print("\nInterrupted by operator.")

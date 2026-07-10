@@ -11,6 +11,7 @@ from labo_gerador_de_ventos.control import (
     BetaflightMSPMultiMotorActuator,
     MockMultiMotorActuator,
     clear_stop_request,
+    ramp_down_multimotor,
     stop_requested,
 )
 from labo_gerador_de_ventos.control.feedback import corrected_throttle
@@ -71,13 +72,21 @@ def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> 
         start = time.monotonic()
         step = 0
         total_s = args.ramp + args.duration + args.ramp
+        last_values = {command.motor: 0.0 for command in base_commands}
         while True:
             elapsed = time.monotonic() - start if real_time else step * args.sample_period
             if elapsed > total_s:
                 break
             if real_time and stop_requested():
-                print("STOP REQUEST DETECTED. Leaving Bench Test 5 loop.")
-                break
+                print(f"STOP REQUEST DETECTED. Applying Bench Test 5 stop ramp for {args.ramp:.2f}s.")
+                ramp_down_multimotor(
+                    actuator,
+                    last_values,
+                    duration_s=args.ramp,
+                    sample_period_s=args.sample_period,
+                    real_time=True,
+                )
+                return
             if elapsed < args.ramp:
                 ramp_factor = elapsed / args.ramp
             elif elapsed < args.ramp + args.duration:
@@ -97,6 +106,7 @@ def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> 
                 command.motor: min(command.throttle * scale * ramp_factor, args.max_throttle)
                 for command in base_commands
             }
+            last_values = values
             actuator.set_throttles(values)
             if hasattr(sensor, "update_throttle"):
                 sensor.update_throttle(sum(values.values()) / len(values))

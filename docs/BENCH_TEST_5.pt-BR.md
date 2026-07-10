@@ -79,13 +79,14 @@ Mídias registradas:
 
 ## Parada pelo aplicativo
 
-O STOP do aplicativo foi corrigido para funcionar como trava persistente. Antes, um único comando
-de stop podia ser sobrescrito pelo loop ativo do Bench Test, fazendo o motor apenas “segurar” e
-continuar. A parada agora:
+O STOP do aplicativo foi corrigido para funcionar como trava persistente com rampa de parada. Antes,
+um único comando de stop podia ser sobrescrito pelo loop ativo do Bench Test, fazendo o motor apenas
+“segurar” e continuar. A parada agora:
 
 - cria um pedido persistente em `artifacts/control/STOP_REQUESTED`;
-- envia frames repetidos de stop por alguns segundos;
-- faz os Bench Tests 3, 4 e 5 encerrarem o loop ao detectar esse pedido.
+- faz os Bench Tests 3, 4 e 5 detectarem esse pedido;
+- reduz o comando ativo até zero usando a rampa configurada;
+- mantém o script de emergência com corte direto disponível para condição de fail-safe.
 
 ## RPM
 

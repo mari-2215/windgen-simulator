@@ -162,8 +162,8 @@ def render_bench_tab() -> None:
     st.code(command, language="bash")
 
     st.subheader("Parada")
-    st.caption("O STOP cria um pedido persistente de parada e envia frames repetidos de stop.")
-    stop_confirmed = st.checkbox("STOP liberado para a porta serial informada")
+    st.caption("O STOP do aplicativo cria um pedido persistente para o bench ativo parar com rampa.")
+    stop_confirmed = st.checkbox("STOP com rampa liberado para a execução ativa")
     if st.button("Enviar STOP agora", type="secondary", disabled=not stop_confirmed):
         root = project_root()
         env = os.environ.copy()
@@ -173,11 +173,8 @@ def render_bench_tab() -> None:
             [
                 sys.executable,
                 "scripts/emergency_stop.py",
-                "--port",
-                port,
                 "--confirm-stop",
-                "--hold",
-                "3.0",
+                "--request-only",
             ],
             cwd=root,
             env=env,
@@ -187,7 +184,7 @@ def render_bench_tab() -> None:
             check=False,
         )
         if stop_result.returncode == 0:
-            st.success("STOP enviado.")
+            st.success("STOP com rampa solicitado.")
         else:
             st.error(f"STOP falhou com código {stop_result.returncode}.")
         if stop_result.stdout:
