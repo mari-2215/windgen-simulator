@@ -64,7 +64,8 @@ registrado nessa etapa não correspondeu a execução pelo app.
 - O app do Bench Test 5 foi ajustado para comando por prompt neural, sem controle manual principal
   de throttle.
 - O parser de prompt passou a aceitar durações compactas como `15s` e `15 s`.
-- Um comando de STOP foi adicionado ao terminal e ao aplicativo.
+- O comando de STOP foi corrigido para criar uma trava persistente, impedindo que o loop ativo
+  volte a enviar throttle após um frame isolado de parada.
 - As mídias do Bench Test 5 com motor outrunner foram adicionadas ao repositório.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.

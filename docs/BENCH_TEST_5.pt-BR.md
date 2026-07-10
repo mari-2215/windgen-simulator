@@ -77,6 +77,16 @@ Mídias registradas:
 - [resposta de throttle com motor outrunner](media/bench-test-5-outrunner-throttle-response.mp4);
 - [execução pelo terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4).
 
+## Parada pelo aplicativo
+
+O STOP do aplicativo foi corrigido para funcionar como trava persistente. Antes, um único comando
+de stop podia ser sobrescrito pelo loop ativo do Bench Test, fazendo o motor apenas “segurar” e
+continuar. A parada agora:
+
+- cria um pedido persistente em `artifacts/control/STOP_REQUESTED`;
+- envia frames repetidos de stop por alguns segundos;
+- faz os Bench Tests 3, 4 e 5 encerrarem o loop ao detectar esse pedido.
+
 ## RPM
 
 A leitura de RPM permanece uma instrumentação separada. Foi identificado que a stack SpeedyBee pode

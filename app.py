@@ -162,6 +162,7 @@ def render_bench_tab() -> None:
     st.code(command, language="bash")
 
     st.subheader("Parada")
+    st.caption("O STOP cria um pedido persistente de parada e envia frames repetidos de stop.")
     stop_confirmed = st.checkbox("STOP liberado para a porta serial informada")
     if st.button("Enviar STOP agora", type="secondary", disabled=not stop_confirmed):
         root = project_root()
@@ -175,6 +176,8 @@ def render_bench_tab() -> None:
                 "--port",
                 port,
                 "--confirm-stop",
+                "--hold",
+                "3.0",
             ],
             cwd=root,
             env=env,
@@ -213,24 +216,42 @@ def render_bench_tab() -> None:
             env = os.environ.copy()
             src_path = str(root / "src")
             env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "")
-            with st.spinner(f"Executando {bench_test} no motor..."):
-                result = subprocess.run(
-                    command_args(config, python_executable=sys.executable),
-                    cwd=root,
-                    env=env,
-                    capture_output=True,
-                    text=True,
-                    timeout=command_timeout_s(config),
-                    check=False,
-                )
-            if result.returncode == 0:
-                st.success(f"{bench_test} finalizado.")
+            log_path = root / "artifacts" / "control" / "bench_app_run.log"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log_handle = log_path.open("w", encoding="utf-8")
+            process = subprocess.Popen(
+                command_args(config, python_executable=sys.executable),
+                cwd=root,
+                env=env,
+                stdout=log_handle,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            st.session_state["bench_process"] = process
+            st.session_state["bench_log_handle"] = log_handle
+            st.session_state["bench_log_path"] = str(log_path)
+            st.session_state["bench_timeout_s"] = command_timeout_s(config)
+            st.success(f"{bench_test} iniciado em background. O botão STOP permanece disponível.")
+
+    process = st.session_state.get("bench_process")
+    log_handle = st.session_state.get("bench_log_handle")
+    log_path_value = st.session_state.get("bench_log_path")
+    if process is not None:
+        return_code = process.poll()
+        if return_code is None:
+            st.warning("Execução física em andamento. Acionar STOP se necessário.")
+            st.button("Atualizar status da execução")
+        else:
+            if log_handle is not None and not log_handle.closed:
+                log_handle.close()
+            if return_code == 0:
+                st.success("Execução física finalizada.")
             else:
-                st.error(f"{bench_test} terminou com código {result.returncode}.")
-            if result.stdout:
-                st.text_area("Saída", result.stdout, height=220)
-            if result.stderr:
-                st.text_area("Erros", result.stderr, height=160)
+                st.error(f"Execução física terminou com código {return_code}.")
+            st.session_state["bench_process"] = None
+        if log_path_value and os.path.exists(log_path_value):
+            with open(log_path_value, encoding="utf-8", errors="ignore") as log_file:
+                st.text_area("Log da execução", log_file.read()[-8000:], height=260)
 
     notes = st.text_area(
         "Registro do ensaio",

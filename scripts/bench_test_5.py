@@ -7,7 +7,12 @@ import os
 import sys
 import time
 
-from labo_gerador_de_ventos.control import BetaflightMSPMultiMotorActuator, MockMultiMotorActuator
+from labo_gerador_de_ventos.control import (
+    BetaflightMSPMultiMotorActuator,
+    MockMultiMotorActuator,
+    clear_stop_request,
+    stop_requested,
+)
 from labo_gerador_de_ventos.control.feedback import corrected_throttle
 from labo_gerador_de_ventos.control.neural_array import infer_motor_throttles
 from labo_gerador_de_ventos.models.mlp import build_default_model
@@ -70,6 +75,9 @@ def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> 
             elapsed = time.monotonic() - start if real_time else step * args.sample_period
             if elapsed > total_s:
                 break
+            if real_time and stop_requested():
+                print("STOP REQUEST DETECTED. Leaving Bench Test 5 loop.")
+                break
             if elapsed < args.ramp:
                 ramp_factor = elapsed / args.ramp
             elif elapsed < args.ramp + args.duration:
@@ -118,6 +126,7 @@ def run_motor(args: argparse.Namespace) -> None:
     if not args.port:
         raise SystemExit("Specify --port for motor mode.")
     require_motor_confirmations(args)
+    clear_stop_request()
     os.environ["LABO_HARDWARE_ENABLE"] = BetaflightMSPMultiMotorActuator.ENABLE_TOKEN
     actuator = BetaflightMSPMultiMotorActuator(args.port, baudrate=args.baudrate)
     try:

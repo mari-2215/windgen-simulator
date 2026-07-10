@@ -15,7 +15,9 @@ from labo_gerador_de_ventos.control import (
     MockActuator,
     SafetyController,
     build_bench_test_3_profile,
+    clear_stop_request,
     interpolate_profile,
+    stop_requested,
 )
 
 
@@ -62,6 +64,9 @@ def run_profile(
     points = interpolate_profile(profile, sample_period_s=sample_period_s)
     start = time.monotonic()
     for point in points:
+        if real_time and stop_requested():
+            print("STOP REQUEST DETECTED. Leaving Bench Test 3 loop.")
+            break
         if real_time:
             delay = point.time_s - (time.monotonic() - start)
             if delay > 0:
@@ -99,6 +104,7 @@ def run_motor(args: argparse.Namespace) -> None:
     if args.max_throttle > 0.60 and not args.allow_full_throttle:
         raise SystemExit("Throttle above 60% requires --allow-full-throttle.")
     require_motor_confirmations(args)
+    clear_stop_request()
 
     os.environ["LABO_HARDWARE_ENABLE"] = BetaflightMSPActuator.ENABLE_TOKEN
     actuator = BetaflightMSPActuator(args.port, baudrate=args.baudrate, motor_index=args.motor - 1)

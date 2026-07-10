@@ -17,6 +17,7 @@ from .profiles import (
     build_bench_test_3_profile,
     interpolate_profile,
 )
+from .stop_signal import clear_stop_request, request_stop, stop_requested, stop_request_path
 
 __all__ = [
     "BetaflightMSPActuator",
@@ -37,4 +38,8 @@ __all__ = [
     "ControlPoint",
     "build_bench_test_3_profile",
     "interpolate_profile",
+    "clear_stop_request",
+    "request_stop",
+    "stop_requested",
+    "stop_request_path",
 ]
