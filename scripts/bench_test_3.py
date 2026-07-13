@@ -14,6 +14,7 @@ from labo_gerador_de_ventos.control import (
     BetaflightMSPActuator,
     MockActuator,
     SafetyController,
+    StopKeyWatcher,
     build_bench_test_3_profile,
     clear_stop_request,
     interpolate_profile,
@@ -63,18 +64,22 @@ def run_profile(
     )
     points = interpolate_profile(profile, sample_period_s=sample_period_s)
     start = time.monotonic()
-    for point in points:
-        if real_time and stop_requested():
-            print("STOP REQUEST DETECTED. Leaving Bench Test 3 loop.")
-            break
-        if real_time:
+    watcher_context = StopKeyWatcher("p") if real_time else None
+    if watcher_context is None:
+        for point in points:
+            applied = controller.command(point.throttle, now=point.time_s)
+            print(f"t={point.time_s:5.2f}s target={point.throttle:6.1%} applied={applied:6.1%}")
+        return
+    with watcher_context as watcher:
+        for point in points:
+            if stop_requested() or watcher.pressed():
+                print("STOP REQUEST DETECTED. Leaving Bench Test 3 loop for ramp down.")
+                break
             delay = point.time_s - (time.monotonic() - start)
             if delay > 0:
                 time.sleep(delay)
             applied = controller.command(point.throttle)
-        else:
-            applied = controller.command(point.throttle, now=point.time_s)
-        print(f"t={point.time_s:5.2f}s target={point.throttle:6.1%} applied={applied:6.1%}")
+            print(f"t={point.time_s:5.2f}s target={point.throttle:6.1%} applied={applied:6.1%}")
 
 
 def run_mock(args: argparse.Namespace) -> None:
@@ -114,6 +119,7 @@ def run_motor(args: argparse.Namespace) -> None:
         max_delta_per_second=args.max_throttle / args.ramp,
     )
     print("Bench Test 3 MOTOR RUN")
+    print("Press p for smooth stop ramp. Ctrl+C remains an interruption path.")
     print(
         f"motor={args.motor} port={args.port} ramp={args.ramp:.2f}s "
         f"hold={args.hold:.2f}s max_throttle={args.max_throttle:.1%}"

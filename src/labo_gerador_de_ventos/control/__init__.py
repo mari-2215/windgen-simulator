@@ -19,6 +19,7 @@ from .profiles import (
 )
 from .ramp import ramp_down_multimotor
 from .stop_signal import clear_stop_request, request_stop, stop_requested, stop_request_path
+from .terminal_stop import StopKeyWatcher
 
 __all__ = [
     "BetaflightMSPActuator",
@@ -44,4 +45,5 @@ __all__ = [
     "request_stop",
     "stop_requested",
     "stop_request_path",
+    "StopKeyWatcher",
 ]

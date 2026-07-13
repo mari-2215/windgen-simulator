@@ -14,6 +14,7 @@ from .control import (
     build_bench_test_3_profile,
     interpolate_profile,
 )
+from .prompt import parse_prompt
 
 
 @dataclass(frozen=True)
@@ -50,13 +51,13 @@ def profile_points(config: BenchAppConfig) -> tuple[ControlPoint, ...]:
         return build_bench_test_3_profile(
             max_throttle=config.max_throttle,
             ramp_s=config.ramp_s,
-            hold_s=config.duration_s,
+            hold_s=effective_duration_s(config),
         )
     if config.bench_test == "Bench Test 5":
         return build_bench_test_3_profile(
             max_throttle=config.max_throttle,
             ramp_s=config.ramp_s,
-            hold_s=config.duration_s,
+            hold_s=effective_duration_s(config),
         )
     raise ValueError(f"unknown bench test: {config.bench_test}")
 
@@ -70,6 +71,13 @@ def profile_frame(config: BenchAppConfig) -> pd.DataFrame:
             "throttle_percent": [100.0 * point.throttle for point in points],
         }
     )
+
+
+def effective_duration_s(config: BenchAppConfig) -> float:
+    """Return the operational duration used by the app profile and commands."""
+    if config.bench_test in ("Bench Test 4", "Bench Test 5"):
+        return parse_prompt(config.prompt).duration_s
+    return config.duration_s
 
 
 def command_preview(config: BenchAppConfig) -> str:
@@ -170,7 +178,7 @@ def command_args(config: BenchAppConfig, *, python_executable: str | None = None
             "--max-throttle",
             f"{config.max_throttle:.2f}",
             "--duration",
-            f"{config.duration_s:.1f}",
+            f"{effective_duration_s(config):.1f}",
             "--ramp",
             f"{config.ramp_s:.1f}",
             "--sample-period",
@@ -202,7 +210,7 @@ def command_args(config: BenchAppConfig, *, python_executable: str | None = None
             "--max-throttle",
             f"{config.max_throttle:.2f}",
             "--duration",
-            f"{config.duration_s:.1f}",
+            f"{effective_duration_s(config):.1f}",
             "--ramp",
             f"{config.ramp_s:.1f}",
             "--sample-period",

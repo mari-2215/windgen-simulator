@@ -12,6 +12,7 @@ from labo_gerador_de_ventos.bench_app import (
     command_args,
     command_preview,
     command_timeout_s,
+    effective_duration_s,
     project_root,
     profile_frame,
 )
@@ -141,11 +142,19 @@ def render_bench_tab() -> None:
         feedback_kp=float(feedback_kp),
     )
 
-    frame = profile_frame(config)
+    try:
+        frame = profile_frame(config)
+        effective_duration = effective_duration_s(config)
+    except ValueError as error:
+        st.error(str(error))
+        return
     a, b, c = st.columns(3)
     a.metric("Duração do perfil", f"{frame.time_s.max():.2f} s")
     b.metric("Throttle máximo planejado", f"{frame.throttle_percent.max():.1f}%")
     c.metric("Amostras", f"{len(frame)}")
+
+    if bench_test in ("Bench Test 4", "Bench Test 5"):
+        st.caption(f"DuraÃ§Ã£o operacional extraÃ­da do prompt: {effective_duration:.1f} s.")
 
     st.line_chart(frame.set_index("time_s")[["throttle_percent"]])
     st.dataframe(frame, use_container_width=True)

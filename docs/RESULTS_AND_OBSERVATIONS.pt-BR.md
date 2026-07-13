@@ -66,6 +66,10 @@ registrado nessa etapa não correspondeu a execução pelo app.
 - O parser de prompt passou a aceitar durações compactas como `15s` e `15 s`.
 - O comando de STOP foi corrigido para criar uma trava persistente e acionar uma rampa de parada,
   impedindo que o loop ativo volte a enviar throttle após um frame isolado de parada.
+- A execução pelo terminal passou a aceitar a tecla `p` como parada operacional com rampa, mantendo
+  `Ctrl+C` como caminho de interrupção.
+- O aplicativo passou a usar a duração escrita no prompt neural para atualizar o perfil e o comando
+  dos Bench Tests 4 e 5.
 - As mídias do Bench Test 5 com motor outrunner foram adicionadas ao repositório.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.

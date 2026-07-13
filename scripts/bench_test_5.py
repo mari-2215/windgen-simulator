@@ -10,6 +10,7 @@ import time
 from labo_gerador_de_ventos.control import (
     BetaflightMSPMultiMotorActuator,
     MockMultiMotorActuator,
+    StopKeyWatcher,
     clear_stop_request,
     ramp_down_multimotor,
     stop_requested,
@@ -73,11 +74,13 @@ def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> 
         step = 0
         total_s = args.ramp + args.duration + args.ramp
         last_values = {command.motor: 0.0 for command in base_commands}
+        watcher_context = StopKeyWatcher("p") if real_time else None
+        watcher = watcher_context.__enter__() if watcher_context is not None else None
         while True:
             elapsed = time.monotonic() - start if real_time else step * args.sample_period
             if elapsed > total_s:
                 break
-            if real_time and stop_requested():
+            if real_time and (stop_requested() or (watcher is not None and watcher.pressed())):
                 print(f"STOP REQUEST DETECTED. Applying Bench Test 5 stop ramp for {args.ramp:.2f}s.")
                 ramp_down_multimotor(
                     actuator,
@@ -122,6 +125,8 @@ def run_loop(args: argparse.Namespace, *, actuator: object, real_time: bool) -> 
                 if delay > 0:
                     time.sleep(delay)
     finally:
+        if "watcher_context" in locals() and watcher_context is not None:
+            watcher_context.__exit__(None, None, None)
         actuator.stop()
         sensor.close()
 
@@ -139,6 +144,7 @@ def run_motor(args: argparse.Namespace) -> None:
     clear_stop_request()
     os.environ["LABO_HARDWARE_ENABLE"] = BetaflightMSPMultiMotorActuator.ENABLE_TOKEN
     actuator = BetaflightMSPMultiMotorActuator(args.port, baudrate=args.baudrate)
+    print("Press p for smooth stop ramp. Ctrl+C remains an interruption path.")
     try:
         actuator.stop()
         run_loop(args, actuator=actuator, real_time=True)

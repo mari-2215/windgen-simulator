@@ -10,6 +10,7 @@ import time
 from labo_gerador_de_ventos.control import (
     BetaflightMSPMultiMotorActuator,
     MockMultiMotorActuator,
+    StopKeyWatcher,
     clear_stop_request,
     infer_motor_throttles,
     ramp_down_multimotor,
@@ -48,37 +49,43 @@ def run_profile(actuator: object, targets: dict[int, float], args: argparse.Name
     start = time.monotonic()
     step = 0
     last_values = {motor: 0.0 for motor in targets}
-    while True:
-        elapsed = time.monotonic() - start if real_time else step * args.sample_period
-        if elapsed > total_s:
-            break
-        if real_time and stop_requested():
-            print(f"STOP REQUEST DETECTED. Applying Bench Test 4 stop ramp for {args.ramp:.2f}s.")
-            ramp_down_multimotor(
-                actuator,
-                last_values,
-                duration_s=args.ramp,
-                sample_period_s=args.sample_period,
-                real_time=True,
-            )
-            return
-        if elapsed < args.ramp:
-            factor = elapsed / args.ramp
-        elif elapsed < args.ramp + args.duration:
-            factor = 1.0
-        else:
-            factor = max(0.0, 1.0 - (elapsed - args.ramp - args.duration) / args.ramp)
-        values = scaled_targets(targets, factor)
-        last_values = values
-        actuator.set_throttles(values)
-        values_text = " ".join(f"M{motor}={value:5.1%}" for motor, value in sorted(values.items()))
-        print(f"t={elapsed:7.2f}s {values_text}")
-        step += 1
-        if real_time:
-            next_time = step * args.sample_period
-            delay = next_time - (time.monotonic() - start)
-            if delay > 0:
-                time.sleep(delay)
+    watcher_context = StopKeyWatcher("p") if real_time else None
+    watcher = watcher_context.__enter__() if watcher_context is not None else None
+    try:
+        while True:
+            elapsed = time.monotonic() - start if real_time else step * args.sample_period
+            if elapsed > total_s:
+                break
+            if real_time and (stop_requested() or (watcher is not None and watcher.pressed())):
+                print(f"STOP REQUEST DETECTED. Applying Bench Test 4 stop ramp for {args.ramp:.2f}s.")
+                ramp_down_multimotor(
+                    actuator,
+                    last_values,
+                    duration_s=args.ramp,
+                    sample_period_s=args.sample_period,
+                    real_time=True,
+                )
+                return
+            if elapsed < args.ramp:
+                factor = elapsed / args.ramp
+            elif elapsed < args.ramp + args.duration:
+                factor = 1.0
+            else:
+                factor = max(0.0, 1.0 - (elapsed - args.ramp - args.duration) / args.ramp)
+            values = scaled_targets(targets, factor)
+            last_values = values
+            actuator.set_throttles(values)
+            values_text = " ".join(f"M{motor}={value:5.1%}" for motor, value in sorted(values.items()))
+            print(f"t={elapsed:7.2f}s {values_text}")
+            step += 1
+            if real_time:
+                next_time = step * args.sample_period
+                delay = next_time - (time.monotonic() - start)
+                if delay > 0:
+                    time.sleep(delay)
+    finally:
+        if watcher_context is not None:
+            watcher_context.__exit__(None, None, None)
     actuator.stop()
 
 
@@ -109,6 +116,7 @@ def run_motor(args: argparse.Namespace) -> None:
     os.environ["LABO_HARDWARE_ENABLE"] = BetaflightMSPMultiMotorActuator.ENABLE_TOKEN
     actuator = BetaflightMSPMultiMotorActuator(args.port, baudrate=args.baudrate)
     print(f"Bench Test 4 MOTOR RUN: duration={args.duration:.1f}s ramp={args.ramp:.1f}s")
+    print("Press p for smooth stop ramp. Ctrl+C remains an interruption path.")
     try:
         actuator.stop()
         run_profile(actuator, targets, args, real_time=True)

@@ -3,6 +3,7 @@ from labo_gerador_de_ventos.bench_app import (
     bench_log_markdown,
     command_args,
     command_preview,
+    effective_duration_s,
     profile_frame,
 )
 
@@ -100,3 +101,22 @@ def test_bench_app_generates_bench_test_5_feedback_command() -> None:
     assert "/dev/ttyUSB0" in args
     assert "--kp" in args
     assert "0.0400" in args
+
+
+def test_bench_app_uses_prompt_duration_for_bench_test_5_profile_and_command() -> None:
+    config = BenchAppConfig(
+        bench_test="Bench Test 5",
+        mode="mock",
+        prompt="vento offshore de 12 m/s por 15 s a 1 m",
+        duration_s=600.0,
+        ramp_s=2.0,
+        sample_period_s=1.0,
+    )
+
+    frame = profile_frame(config)
+    args = command_args(config, python_executable="python3")
+
+    assert effective_duration_s(config) == 15.0
+    assert frame.time_s.max() == 19.0
+    assert "--duration" in args
+    assert "15.0" in args

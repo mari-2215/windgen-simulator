@@ -88,6 +88,13 @@ um único comando de stop podia ser sobrescrito pelo loop ativo do Bench Test, f
 - reduz o comando ativo até zero usando a rampa configurada;
 - mantém o script de emergência com corte direto disponível para condição de fail-safe.
 
+Na execução pelo terminal, a tecla `p` passou a solicitar parada operacional suave. O uso de
+`Ctrl+C` permanece como interrupção/fail-safe.
+
+No aplicativo, a duração escrita no prompt neural passou a atualizar o perfil planejado e o comando
+gerado para os Bench Tests 4 e 5. Exemplo: `por 15 s` gera patamar operacional de 15 segundos,
+independentemente do campo de duração padrão.
+
 ## RPM
 
 A leitura de RPM permanece uma instrumentação separada. Foi identificado que a stack SpeedyBee pode
