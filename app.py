@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import os
+import json
 import subprocess
 import sys
+import time
+from pathlib import Path
 
 import streamlit as st
 
@@ -68,6 +71,205 @@ def render_simulation_tab() -> None:
             st.error(str(error))
 
 
+def write_manual_command(*, active: bool, wind_mps: float, distance_m: float) -> Path:
+    root = project_root()
+    command_path = root / "artifacts" / "control" / "manual_command.json"
+    command_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = command_path.with_suffix(".tmp")
+    temporary_path.write_text(
+        json.dumps(
+            {
+                "active": active,
+                "wind_mps": wind_mps,
+                "distance_m": distance_m,
+                "heartbeat": time.time(),
+            }
+        ),
+        encoding="utf-8",
+    )
+    temporary_path.replace(command_path)
+    return command_path
+
+
+def manual_process_running() -> bool:
+    process = st.session_state.get("manual_process")
+    return process is not None and process.poll() is None
+
+
+def request_manual_stop() -> None:
+    st.session_state["manual_stop_requested"] = True
+    write_manual_command(
+        active=False,
+        wind_mps=float(st.session_state.get("manual_wind_mps", 0.0)),
+        distance_m=float(st.session_state.get("manual_distance_m", 1.0)),
+    )
+
+
+def stop_manual_process_if_leaving(selected_test: str) -> None:
+    if selected_test != "Controle manual contínuo" and manual_process_running():
+        request_manual_stop()
+
+
+@st.fragment(run_every=1.0)
+def render_manual_status() -> None:
+    process = st.session_state.get("manual_process")
+    log_handle = st.session_state.get("manual_log_handle")
+    log_path_value = st.session_state.get("manual_log_path")
+    if process is None:
+        return
+    return_code = process.poll()
+    if return_code is None:
+        if st.session_state.get("manual_stop_requested", False):
+            request_manual_stop()
+            st.info("Parada solicitada; aguardando a rampa chegar a zero.")
+        else:
+            write_manual_command(
+                active=True,
+                wind_mps=float(st.session_state["manual_wind_mps"]),
+                distance_m=float(st.session_state["manual_distance_m"]),
+            )
+            st.warning("Controle manual ativo. Alterações de velocidade e distância são aplicadas automaticamente.")
+    else:
+        if log_handle is not None and not log_handle.closed:
+            log_handle.close()
+        st.session_state["manual_process"] = None
+        st.session_state["manual_stop_requested"] = False
+        if return_code == 0:
+            st.success("Controle manual encerrado e STOP enviado.")
+        else:
+            st.error(f"Controle manual terminou com código {return_code}.")
+    if log_path_value and os.path.exists(log_path_value):
+        with open(log_path_value, encoding="utf-8", errors="ignore") as log_file:
+            lines = log_file.readlines()
+        st.text_area("Log do controle manual", "".join(lines[-80:]), height=220)
+
+
+def render_manual_continuous_control() -> None:
+    st.subheader("Controle manual contínuo")
+    st.caption(
+        "Defina o vento desejado no ponto do modelo. O motor permanece ligado e acompanha as alterações "
+        "até você parar ou sair deste modo."
+    )
+    st.warning(
+        "A conversão vento → throttle ainda usa a calibração sintética. Use o anemômetro para registrar "
+        "os pontos reais até substituirmos o modelo provisório."
+    )
+
+    left, right = st.columns(2)
+    with left:
+        wind_mps = st.number_input(
+            "Velocidade desejada no modelo (m/s)",
+            min_value=0.0,
+            max_value=19.0,
+            value=1.0,
+            step=0.1,
+            key="manual_wind_mps",
+        )
+        distance_m = st.number_input(
+            "Distância entre a hélice e o modelo (m)",
+            min_value=0.10,
+            max_value=10.0,
+            value=1.0,
+            step=0.05,
+            key="manual_distance_m",
+        )
+        port = st.text_input("Porta da controladora", "/dev/ttyACM0", key="manual_port")
+    with right:
+        motor_count = st.number_input(
+            "Quantidade de motores",
+            min_value=1,
+            max_value=4,
+            value=1,
+            step=1,
+            key="manual_motor_count",
+        )
+        max_throttle = st.slider(
+            "Limite máximo de throttle",
+            min_value=0.01,
+            max_value=1.0,
+            value=1.0,
+            step=0.01,
+            key="manual_max_throttle",
+        )
+        ramp_s = st.number_input(
+            "Tempo de rampa até 100% (s)",
+            min_value=1.0,
+            max_value=20.0,
+            value=5.0,
+            step=0.5,
+            key="manual_ramp_s",
+        )
+
+    running = manual_process_running()
+    if running and not st.session_state.get("manual_stop_requested", False):
+        write_manual_command(active=True, wind_mps=float(wind_mps), distance_m=float(distance_m))
+
+    secured = st.checkbox(
+        "Motor/arranjo preso e protegido",
+        disabled=running,
+        key="manual_secured",
+    )
+    supervised = st.checkbox(
+        "Supervisão de laboratório ativa",
+        disabled=running,
+        key="manual_supervised",
+    )
+    estop = st.checkbox(
+        "Corte físico de energia pronto",
+        disabled=running,
+        key="manual_estop",
+    )
+
+    start_col, stop_col = st.columns(2)
+    with start_col:
+        ready = secured and supervised and estop and not running
+        if st.button("Iniciar controle contínuo", type="primary", disabled=not ready):
+            root = project_root()
+            command_path = write_manual_command(
+                active=True,
+                wind_mps=float(wind_mps),
+                distance_m=float(distance_m),
+            )
+            env = os.environ.copy()
+            src_path = str(root / "src")
+            env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "")
+            log_path = root / "artifacts" / "control" / "manual_control.log"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log_handle = log_path.open("w", encoding="utf-8")
+            process = subprocess.Popen(
+                [
+                    sys.executable,
+                    "scripts/manual_continuous.py",
+                    "--port",
+                    port,
+                    "--command-file",
+                    str(command_path),
+                    "--motor-count",
+                    str(int(motor_count)),
+                    "--max-throttle",
+                    f"{float(max_throttle):.2f}",
+                    "--ramp-seconds",
+                    f"{float(ramp_s):.1f}",
+                ],
+                cwd=root,
+                env=env,
+                stdout=log_handle,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            st.session_state["manual_process"] = process
+            st.session_state["manual_log_handle"] = log_handle
+            st.session_state["manual_log_path"] = str(log_path)
+            st.session_state["manual_stop_requested"] = False
+            st.rerun()
+    with stop_col:
+        if st.button("Parar motor", disabled=not running):
+            request_manual_stop()
+            st.success("Parada solicitada; aplicando rampa para zero.")
+
+    render_manual_status()
+
+
 def render_bench_tab() -> None:
     st.subheader("Bench Tests")
     st.caption(
@@ -75,12 +277,24 @@ def render_bench_tab() -> None:
         "execução guardada, feedback de vento e registro."
     )
 
+    bench_test = st.selectbox(
+        "Teste",
+        [
+            "Controle manual contínuo",
+            "Bench Test 1",
+            "Bench Test 2",
+            "Bench Test 3",
+            "Bench Test 4",
+            "Bench Test 5",
+        ],
+    )
+    stop_manual_process_if_leaving(bench_test)
+    if bench_test == "Controle manual contínuo":
+        render_manual_continuous_control()
+        return
+
     col_left, col_right = st.columns([1, 1])
     with col_left:
-        bench_test = st.selectbox(
-            "Teste",
-            ["Bench Test 1", "Bench Test 2", "Bench Test 3", "Bench Test 4", "Bench Test 5"],
-        )
         mode_options = {
             "Bench Test 1": ["mock", "neural-mock", "serial-check", "physical-preview"],
             "Bench Test 2": ["mock", "physical-preview"],
