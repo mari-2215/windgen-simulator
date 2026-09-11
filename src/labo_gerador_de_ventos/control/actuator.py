@@ -93,6 +93,18 @@ def probe_betaflight(port: str, baudrate: int = 115200) -> tuple[int, int, int]:
     return payload[0], payload[1], payload[2]
 
 
+def send_msp_v1_command(serial_port: object, command: int, payload: bytes) -> bytes:
+    """Send one MSP command and consume its reply before sending another.
+
+    Betaflight acknowledges write commands too.  Consuming that acknowledgement
+    prevents the FC-to-host serial buffer from filling during continuous motor
+    control.
+    """
+    serial_port.write(build_msp_v1_frame(command, payload))
+    serial_port.flush()
+    return read_msp_v1_response(serial_port, expected_command=command, timeout_s=0.5)
+
+
 class BetaflightMSPActuator:
     """Backend experimental MSP v1; exige validação local da versão do firmware."""
 
@@ -110,8 +122,7 @@ class BetaflightMSPActuator:
         self.motor_index = motor_index
 
     def _send(self, command: int, payload: bytes) -> None:
-        self.serial.write(build_msp_v1_frame(command, payload))
-        self.serial.flush()
+        send_msp_v1_command(self.serial, command, payload)
 
     def set_throttle(self, value: float) -> None:
         value = min(max(float(value), 0.0), 1.0)
@@ -140,8 +151,7 @@ class BetaflightMSPMultiMotorActuator:
         self.serial = serial.Serial(port, baudrate=baudrate, timeout=0.2)
 
     def _send(self, command: int, payload: bytes) -> None:
-        self.serial.write(build_msp_v1_frame(command, payload))
-        self.serial.flush()
+        send_msp_v1_command(self.serial, command, payload)
 
     def set_throttles(self, values: dict[int, float]) -> None:
         motors = [1000] * 8

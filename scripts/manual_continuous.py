@@ -53,7 +53,7 @@ def main() -> None:
     parser.add_argument("--max-throttle", type=float, default=1.0)
     parser.add_argument("--sample-period", type=float, default=0.10)
     parser.add_argument("--ramp-seconds", type=float, default=3.0)
-    parser.add_argument("--heartbeat-timeout", type=float, default=4.0)
+    parser.add_argument("--heartbeat-timeout", type=float, default=30.0)
     parser.add_argument("--baudrate", type=int, default=115200)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--epochs", type=int, default=600)
