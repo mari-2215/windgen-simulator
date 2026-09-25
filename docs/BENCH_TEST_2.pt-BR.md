@@ -41,6 +41,11 @@ Mídia registrada:
 
 - [vídeo do perfil de gradiente com o inrunner no Bench Test 2](media/bench-test-2-gradient-run.mp4).
 
+![Motor inrunner durante o perfil de gradiente](media/bench-test-2-gradient-frame.jpg)
+
+*Quadro extraído do vídeo do Bench Test 2, mostrando a fixação utilizada durante o perfil de
+gradiente.*
+
 ## Execução física, mantida bloqueada por padrão
 
 Como o perfil alcança 60% de throttle, a execução física ficou condicionada a liberação explícita,

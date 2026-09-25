@@ -115,6 +115,10 @@ Materiais registrados:
 - [dashboard - gráfico de velocidade](media/dashboard-plot.png);
 - [dashboard - tabela exportável](media/dashboard-table.png).
 
+![Motor inrunner fixado durante o Bench Test 1](media/bench-test-1-inrunner-frame.jpg)
+
+*Quadro extraído do vídeo do Bench Test 1, registrando o motor inrunner fixado na bancada.*
+
 ![Dashboard com entrada do cenário](media/dashboard-input.png)
 
 ![Dashboard com gráfico de velocidade do vento](media/dashboard-plot.png)

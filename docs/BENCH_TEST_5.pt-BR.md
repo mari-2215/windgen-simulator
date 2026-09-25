@@ -82,6 +82,20 @@ O último vídeo registra o procedimento de medição externa. A leitura exibida
 evidência do ensaio naquele instante; para calibração, cada ponto ainda deve ser registrado com
 distância, throttle, posição do sensor, média, pico e repetição.
 
+![Motor outrunner utilizado no Bench Test 5](media/bench-test-5-outrunner-frame.jpg)
+
+*Quadro extraído do ensaio de resposta ao throttle com o motor outrunner.*
+
+![Saída do Bench Test 5 no terminal](media/bench-test-5-terminal-frame.jpg)
+
+*Quadro extraído da execução com amostragem de 0,1 s, mostrando o acompanhamento dos valores no
+terminal.*
+
+![Medição externa durante o Bench Test 5](media/bench-test-5-anemometer-frame.jpg)
+
+*Quadro extraído do ensaio com anemômetro externo. A imagem documenta o procedimento, não uma curva
+de calibração concluída.*
+
 ## Parada pelo aplicativo
 
 O STOP do aplicativo foi corrigido para funcionar como trava persistente com rampa de parada. Antes,
