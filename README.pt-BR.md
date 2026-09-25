@@ -74,7 +74,8 @@ O Bench Test 2 também foi concluído com sucesso, validando o perfil com mudan�
 Bench Test 3 foi concluído com sucesso, registrando melhor comportamento com 61 amostras na rampa
 de finalização. O Bench Test 4 mostrou o ensaio longo pelo terminal e abriu a necessidade de malha
 fechada. O Bench Test 5 introduz feedback de velocidade atual do vento usando fonte simulada ou
-anemômetro serial externo.
+anemômetro serial externo. O Bench Test 6 escala o modo manual contínuo para quatro motores em
+matriz 2 × 2, com alteração de velocidade durante o ensaio e parada ao sair do modo.
 
 O aplicativo de bancada foi incorporado ao `app.py`, concentrando planejamento, visualização do
 perfil, comando pronto, registro do ensaio e execução física guardada do Bench Test 3.
@@ -84,11 +85,16 @@ perfil, comando pronto, registro do ensaio e execução física guardada do Benc
 - [Bench Test 3](docs/BENCH_TEST_3.pt-BR.md)
 - [Bench Test 4](docs/BENCH_TEST_4.pt-BR.md)
 - [Bench Test 5](docs/BENCH_TEST_5.pt-BR.md)
+- [Bench Test 6 — controle contínuo com quatro motores](docs/BENCH_TEST_6.pt-BR.md)
 - [Notas de RPM pela SpeedyBee](docs/RPM_SPEEDYBEE.pt-BR.md)
 - [Vídeo do Bench Test 1](docs/media/bench-test-1-motor-run.mp4)
 - [Vídeo do Bench Test 2](docs/media/bench-test-2-gradient-run.mp4)
 - [Vídeo do Bench Test 5 - outrunner](docs/media/bench-test-5-outrunner-throttle-response.mp4)
 - [Vídeo do Bench Test 5 - terminal 0.1 s](docs/media/bench-test-5-terminal-sampling-010.mp4)
+- [Vídeo do Bench Test 6 - seleção da saída física](docs/media/bench-test-6-motor-output-selection.mp4)
+- [Vídeo do Bench Test 6 - bancada com quatro motores](docs/media/bench-test-6-four-motor-operation.mp4)
+
+![Montagem provisória do Bench Test 6](docs/media/bench-test-6-four-motor-setup.jpeg)
 
 ![Dashboard do simulador](docs/media/dashboard-plot.png)
 
@@ -106,6 +112,7 @@ O controle foi distribuído em camadas auditáveis:
 - `scripts/bench_test_3.py`: planejando rampa de 2 s, patamar de throttle máximo e descida de 2 s.
 - `scripts/bench_test_4.py`: executando comando neural por prompt, exaustão e layout 1-4 motores.
 - `scripts/bench_test_5.py`: executando comando neural com feedback de velocidade atual do vento.
+- `scripts/manual_continuous.py`: executando o Bench Test 6 contínuo nas saídas M1–M4.
 - `src/labo_gerador_de_ventos/control/neural_array.py`: distribuindo throttle neural por posição.
 - `src/labo_gerador_de_ventos/sensors/wind.py`: lendo vento simulado ou anemômetro serial.
 

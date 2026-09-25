@@ -51,6 +51,18 @@ embora a leitura de RPM pelo SpeedyBee ainda não tenha sido obtida. O motor reg
 `0.1 s` pelo terminal apresentou melhor resposta e reduziu engasgos durante a rampa. O vídeo
 registrado nessa etapa não correspondeu a execução pelo app.
 
+## Bench Test 6
+
+O Bench Test 6 foi definido para escalar o modo manual contínuo para quatro motores outrunner nas
+saídas `M1` a `M4`. O arranjo físico inicial é uma matriz `2 × 2`, com motores vizinhos em sentidos
+de giro opostos. O aplicativo permite alterar velocidade e distância durante o ensaio e solicita
+parada em rampa quando o operador sai do modo.
+
+Uma medição preliminar com anemômetro melhor registrou aproximadamente `3 m/s` a `1 m` para um alvo
+de `1 m/s`. Esse resultado confirmou que a MLP sintética ainda não representa a bancada real. A
+próxima etapa é mapear o campo de vento e recalibrar a relação entre distância, throttle e
+velocidade usando os quatro motores instalados.
+
 ## Melhorias incorporadas
 
 - A rampa de parada foi adicionada ao fluxo normal do `scripts/bench_test_1.py`.
@@ -61,6 +73,7 @@ registrado nessa etapa não correspondeu a execução pelo app.
 - O aplicativo de bancada foi atualizado para execução física guardada do Bench Test 3.
 - O Bench Test 4 foi adicionado com comando por prompt neural, duração longa e layout multimotor.
 - O Bench Test 5 foi adicionado com feedback de vento atual e fonte de sensor `simulated`/`serial`.
+- O Bench Test 6 foi adicionado com controle contínuo nas saídas M1-M4 e arranjo físico 2 × 2.
 - O app do Bench Test 5 foi ajustado para comando por prompt neural, sem controle manual principal
   de throttle.
 - O parser de prompt passou a aceitar durações compactas como `15s` e `15 s`.
@@ -71,6 +84,8 @@ registrado nessa etapa não correspondeu a execução pelo app.
 - O aplicativo passou a usar a duração escrita no prompt neural para atualizar o perfil e o comando
   dos Bench Tests 4 e 5.
 - As mídias do Bench Test 5 com motor outrunner foram adicionadas ao repositório.
+- O conjunto visual de 25 de setembro de 2026 passou a documentar a bancada com quatro motores, a
+  seleção da saída física, a eletrônica original DJI e os anemômetros utilizados.
 - A documentação passou a registrar a necessidade de uma aplicação dedicada para facilitar a
   operação em bancada.
 - As mídias do dashboard e do ensaio passaram a ser referenciadas no repositório.
@@ -81,6 +96,12 @@ registrado nessa etapa não correspondeu a execução pelo app.
 - [Vídeo do Bench Test 2](media/bench-test-2-gradient-run.mp4)
 - [Vídeo do Bench Test 5 - resposta com outrunner](media/bench-test-5-outrunner-throttle-response.mp4)
 - [Vídeo do Bench Test 5 - terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4)
+- [Vídeo do Bench Test 5 - medição por anemômetro](media/bench-test-5-anemometer-measurement.mp4)
+- [Vídeo do Bench Test 6 - seleção da saída de motor](media/bench-test-6-motor-output-selection.mp4)
+- [Vídeo do Bench Test 6 - operação da bancada com quatro motores](media/bench-test-6-four-motor-operation.mp4)
+- [Foto do Bench Test 6 - montagem com quatro motores](media/bench-test-6-four-motor-setup.jpeg)
+- [Foto da eletrônica original DJI Phantom](media/dji-phantom-motor-electronics.jpeg)
+- [Foto do anemômetro Testo 416](media/testo-416-anemometer.jpeg)
 - [Dashboard - entrada do cenário](media/dashboard-input.png)
 - [Dashboard - gráfico de velocidade](media/dashboard-plot.png)
 - [Dashboard - tabela exportável](media/dashboard-table.png)
@@ -90,3 +111,7 @@ registrado nessa etapa não correspondeu a execução pelo app.
 ![Gráfico de velocidade do vento no dashboard](media/dashboard-plot.png)
 
 ![Tabela exportável no dashboard](media/dashboard-table.png)
+
+![Montagem provisória do Bench Test 6](media/bench-test-6-four-motor-setup.jpeg)
+
+![Anemômetro Testo 416](media/testo-416-anemometer.jpeg)
