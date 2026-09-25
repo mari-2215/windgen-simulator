@@ -177,7 +177,7 @@ def render_manual_continuous_control() -> None:
     with right:
         motor_array = st.selectbox(
             "Arranjo de motores",
-            ["4 motores — matriz 2×2 (M1–M4)", "1 motor — calibração (M1)"],
+            ["4 motores — matriz 2×2 (M1–M4)", "1 motor — calibração"],
             key="manual_motor_array",
         )
         max_throttle = st.slider(
@@ -198,7 +198,17 @@ def render_manual_continuous_control() -> None:
         )
 
     four_motors = motor_array.startswith("4 motores")
-    motor_outputs = "1,2,3,4" if four_motors else "1"
+    single_motor_output = 1
+    if not four_motors:
+        single_motor_output = st.number_input(
+            "Saída do motor para calibração",
+            min_value=1,
+            max_value=8,
+            value=1,
+            step=1,
+            key="manual_motor_output",
+        )
+    motor_outputs = "1,2,3,4" if four_motors else str(int(single_motor_output))
     if four_motors:
         st.info(
             "Posicionamento sugerido: matriz 2×2. M1 superior esquerdo, M2 superior direito, "

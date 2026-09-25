@@ -36,6 +36,26 @@ def test_neural_array_respects_safety_ceiling() -> None:
     assert commands[0].throttle == pytest.approx(0.50)
 
 
+def test_neural_array_respects_selected_motor_id() -> None:
+    commands = infer_motor_throttles(
+        "vento de 1 m/s a 1 m",
+        FixedModel(0.25),
+        motor_count=2,
+        motor_start=3,
+    )
+    assert [command.motor for command in commands] == [3, 4]
+
+
+def test_neural_array_rejects_motor_range_above_eight() -> None:
+    with pytest.raises(ValueError, match="M1..M8"):
+        infer_motor_throttles(
+            "vento de 1 m/s a 1 m",
+            FixedModel(0.25),
+            motor_count=2,
+            motor_start=8,
+        )
+
+
 def test_neural_array_rejects_invalid_layout() -> None:
     with pytest.raises(ValueError):
         infer_motor_throttles("vento de 8 m/s", FixedModel(0.3), layout="circle")

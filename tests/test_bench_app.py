@@ -67,6 +67,7 @@ def test_bench_app_generates_bench_test_4_neural_motor_command() -> None:
         mode="motor",
         prompt="vento offshore de 12 m/s por 10 min a 1 m",
         layout="x",
+        motor=3,
         motor_count=4,
         duration_s=600.0,
         max_throttle=1.0,
@@ -78,6 +79,7 @@ def test_bench_app_generates_bench_test_4_neural_motor_command() -> None:
     assert "x" in args
     assert "--motor-count" in args
     assert "4" in args
+    assert args[args.index("--motor-start") + 1] == "3"
 
 
 def test_bench_app_generates_bench_test_5_feedback_command() -> None:
@@ -86,6 +88,7 @@ def test_bench_app_generates_bench_test_5_feedback_command() -> None:
         mode="motor",
         prompt="vento offshore de 12 m/s por 60 s a 1 m",
         layout="cross",
+        motor=4,
         motor_count=1,
         duration_s=60.0,
         max_throttle=1.0,
@@ -101,6 +104,7 @@ def test_bench_app_generates_bench_test_5_feedback_command() -> None:
     assert "/dev/ttyUSB0" in args
     assert "--kp" in args
     assert "0.0400" in args
+    assert args[args.index("--motor-start") + 1] == "4"
 
 
 def test_bench_app_uses_prompt_duration_for_bench_test_5_profile_and_command() -> None:

@@ -30,11 +30,16 @@ def infer_motor_throttles(
     model: ThrottleModel,
     *,
     motor_count: int = 1,
+    motor_start: int = 1,
     layout: str = "cross",
     safety_ceiling: float = 1.0,
 ) -> list[MotorThrottle]:
     if motor_count not in range(1, 5):
         raise ValueError("motor_count must be in 1..4")
+    if motor_start not in range(1, 9):
+        raise ValueError("motor_start must be in 1..8")
+    if motor_start + motor_count - 1 > 8:
+        raise ValueError("selected motor range must stay within M1..M8")
     if layout not in LAYOUTS:
         raise ValueError("layout must be 'cross' or 'x'")
     if not 0.0 < safety_ceiling <= 1.0:
@@ -47,7 +52,11 @@ def infer_motor_throttles(
     factors = directional_factors(prompt, positions)
     peak = max(factors) if factors else 1.0
     return [
-        MotorThrottle(index + 1, position, float(np.clip(base * factor / peak, 0.0, safety_ceiling)))
+        MotorThrottle(
+            motor_start + index,
+            position,
+            float(np.clip(base * factor / peak, 0.0, safety_ceiling)),
+        )
         for index, (position, factor) in enumerate(zip(positions, factors))
     ]
 

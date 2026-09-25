@@ -31,6 +31,7 @@ def target_map(args: argparse.Namespace) -> dict[int, float]:
         args.prompt,
         model,
         motor_count=args.motor_count,
+        motor_start=args.motor_start,
         layout=args.layout,
         safety_ceiling=args.max_throttle,
     )
@@ -136,6 +137,7 @@ def main() -> None:
     parser.add_argument("--prompt", default="vento offshore de 12 m/s por 10 min a 1 m")
     parser.add_argument("--layout", choices=("cross", "x"), default="cross")
     parser.add_argument("--motor-count", type=int, choices=range(1, 5), default=1)
+    parser.add_argument("--motor-start", type=int, choices=range(1, 9), default=1)
     parser.add_argument("--max-throttle", type=float, default=1.0)
     parser.add_argument("--duration", type=float, default=600.0)
     parser.add_argument("--ramp", type=float, default=2.0)
