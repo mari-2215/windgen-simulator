@@ -19,6 +19,24 @@ from labo_gerador_de_ventos.control import BetaflightMSPMultiMotorActuator
 from labo_gerador_de_ventos.models.mlp import build_default_model
 
 
+def parse_motor_outputs(value: str) -> tuple[int, ...]:
+    try:
+        outputs = tuple(int(item.strip()) for item in value.split(",") if item.strip())
+    except ValueError as error:
+        raise ValueError("motor outputs must be comma-separated integers") from error
+    if not outputs:
+        raise ValueError("at least one motor output is required")
+    if len(outputs) != len(set(outputs)):
+        raise ValueError("motor outputs must not repeat")
+    if any(output not in range(1, 9) for output in outputs):
+        raise ValueError("motor outputs must stay within 1..8")
+    return outputs
+
+
+def motor_commands(outputs: tuple[int, ...], throttle: float) -> dict[int, float]:
+    return {output: throttle for output in outputs}
+
+
 def read_command(path: Path) -> dict[str, object]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -50,6 +68,10 @@ def main() -> None:
     parser.add_argument("--port", required=True)
     parser.add_argument("--command-file", type=Path, required=True)
     parser.add_argument("--motor-count", type=int, choices=range(1, 5), default=1)
+    parser.add_argument(
+        "--motor-outputs",
+        help="comma-separated Betaflight outputs, for example 1,2,3,4; overrides --motor-count",
+    )
     parser.add_argument("--max-throttle", type=float, default=1.0)
     parser.add_argument("--sample-period", type=float, default=0.10)
     parser.add_argument("--ramp-seconds", type=float, default=3.0)
@@ -64,6 +86,12 @@ def main() -> None:
     if args.sample_period <= 0.0 or args.ramp_seconds <= 0.0 or args.heartbeat_timeout <= 0.0:
         raise SystemExit("timing values must be positive")
 
+    outputs = (
+        parse_motor_outputs(args.motor_outputs)
+        if args.motor_outputs
+        else tuple(range(1, args.motor_count + 1))
+    )
+
     model = build_default_model(seed=args.seed, epochs=args.epochs)
     os.environ["LABO_HARDWARE_ENABLE"] = BetaflightMSPMultiMotorActuator.ENABLE_TOKEN
     actuator = BetaflightMSPMultiMotorActuator(args.port, baudrate=args.baudrate)
@@ -71,7 +99,8 @@ def main() -> None:
     ramp_rate = args.max_throttle / args.ramp_seconds
     previous = time.monotonic()
 
-    print("Manual continuous control ready.", flush=True)
+    outputs_text = ",".join(f"M{output}" for output in outputs)
+    print(f"Manual continuous control ready. outputs={outputs_text}", flush=True)
     try:
         actuator.stop()
         while True:
@@ -88,7 +117,7 @@ def main() -> None:
                 print(f"STOP: {reason}; applying ramp down.", flush=True)
                 while throttle > 0.0:
                     throttle = ramp_value(throttle, 0.0, ramp_rate, args.sample_period)
-                    actuator.set_throttles({motor: throttle for motor in range(1, args.motor_count + 1)})
+                    actuator.set_throttles(motor_commands(outputs, throttle))
                     time.sleep(args.sample_period)
                 break
 
@@ -96,10 +125,12 @@ def main() -> None:
             distance_m = float(command["distance_m"])
             target = requested_throttle(model, wind_mps, distance_m, args.max_throttle)
             throttle = ramp_value(throttle, target, ramp_rate, elapsed)
-            actuator.set_throttles({motor: throttle for motor in range(1, args.motor_count + 1)})
+            values = motor_commands(outputs, throttle)
+            actuator.set_throttles(values)
+            values_text = " ".join(f"M{motor}={value:.1%}" for motor, value in values.items())
             print(
                 f"wind_target={wind_mps:.2f} m/s distance={distance_m:.2f} m "
-                f"target_throttle={target:.1%} applied={throttle:.1%}",
+                f"target_throttle={target:.1%} applied={throttle:.1%} {values_text}",
                 flush=True,
             )
             time.sleep(args.sample_period)

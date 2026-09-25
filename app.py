@@ -175,13 +175,10 @@ def render_manual_continuous_control() -> None:
         )
         port = st.text_input("Porta da controladora", "/dev/ttyACM0", key="manual_port")
     with right:
-        motor_count = st.number_input(
-            "Quantidade de motores",
-            min_value=1,
-            max_value=4,
-            value=1,
-            step=1,
-            key="manual_motor_count",
+        motor_array = st.selectbox(
+            "Arranjo de motores",
+            ["4 motores — matriz 2×2 (M1–M4)", "1 motor — calibração (M1)"],
+            key="manual_motor_array",
         )
         max_throttle = st.slider(
             "Limite máximo de throttle",
@@ -198,6 +195,14 @@ def render_manual_continuous_control() -> None:
             value=5.0,
             step=0.5,
             key="manual_ramp_s",
+        )
+
+    four_motors = motor_array.startswith("4 motores")
+    motor_outputs = "1,2,3,4" if four_motors else "1"
+    if four_motors:
+        st.info(
+            "Posicionamento sugerido: matriz 2×2. M1 superior esquerdo, M2 superior direito, "
+            "M3 inferior direito e M4 inferior esquerdo. Motores vizinhos devem girar em sentidos opostos."
         )
 
     running = manual_process_running()
@@ -245,7 +250,9 @@ def render_manual_continuous_control() -> None:
                     "--command-file",
                     str(command_path),
                     "--motor-count",
-                    str(int(motor_count)),
+                    "4" if four_motors else "1",
+                    "--motor-outputs",
+                    motor_outputs,
                     "--max-throttle",
                     f"{float(max_throttle):.2f}",
                     "--ramp-seconds",
