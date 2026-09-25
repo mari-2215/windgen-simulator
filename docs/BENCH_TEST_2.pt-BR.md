@@ -34,11 +34,12 @@ A execução em `mock` imprime os alvos e valores aplicados sem enviar comando f
 
 O Bench Test 2 foi registrado como **bem-sucedido**. A sequência de gradiente foi executada como
 continuidade do Bench Test 1, validando a transição entre patamares de throttle e mantendo a lógica
-de rampa controlada.
+de rampa controlada. Este registro ainda corresponde à primeira fase da bancada, com o motor
+inrunner, antes da substituição pelo outrunner adotado nos ensaios posteriores.
 
 Mídia registrada:
 
-- [vídeo do Bench Test 2](media/bench-test-2-gradient-run.mp4).
+- [vídeo do perfil de gradiente com o inrunner no Bench Test 2](media/bench-test-2-gradient-run.mp4).
 
 ## Execução física, mantida bloqueada por padrão
 

@@ -1,7 +1,8 @@
 # Bench Test 1 - plano de teste de bancada e filmagem
 
 O protocolo foi estruturado considerando o material disponível: Raspberry Pi 2B, stack SpeedyBee
-F405 V4 e um motor brushless outrunner. A confirmação elétrica do motor, do ESC e da alimentação
+F405 V4 e o motor brushless inrunner usado na primeira fase. A confirmação elétrica do motor, do
+ESC e da alimentação
 permaneceu estabelecida como condição de liberação do ensaio físico.
 
 ## Mantendo os recursos necessários
@@ -109,7 +110,7 @@ formalizar uma rampa de parada além da rampa inicial, melhoria incorporada ao s
 
 Materiais registrados:
 
-- [vídeo do giro do Bench Test 1](media/bench-test-1-motor-run.mp4);
+- [vídeo do giro do motor inrunner no Bench Test 1](media/bench-test-1-motor-run.mp4);
 - [dashboard - entrada do cenário](media/dashboard-input.png);
 - [dashboard - gráfico de velocidade](media/dashboard-plot.png);
 - [dashboard - tabela exportável](media/dashboard-table.png).

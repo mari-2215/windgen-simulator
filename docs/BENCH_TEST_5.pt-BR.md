@@ -75,7 +75,12 @@ vídeo registrado não correspondeu a uma execução feita pela interface.
 Mídias registradas:
 
 - [resposta de throttle com motor outrunner](media/bench-test-5-outrunner-throttle-response.mp4);
-- [execução pelo terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4).
+- [execução pelo terminal com amostragem 0.1 s](media/bench-test-5-terminal-sampling-010.mp4);
+- [ensaio com medição externa por anemômetro](media/bench-test-5-anemometer-measurement.mp4).
+
+O último vídeo registra o procedimento de medição externa. A leitura exibida no instrumento é uma
+evidência do ensaio naquele instante; para calibração, cada ponto ainda deve ser registrado com
+distância, throttle, posição do sensor, média, pico e repetição.
 
 ## Parada pelo aplicativo
 
